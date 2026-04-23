@@ -14,13 +14,124 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      items: {
+        Row: {
+          armor_af: number | null
+          armor_type: string | null
+          bonus_level: number | null
+          class_restriction: string | null
+          created_at: string
+          effects: Json
+          external_id: string | null
+          id: string
+          item_level: number | null
+          level: number | null
+          name: string
+          online_url: string | null
+          origin: string | null
+          quality: number | null
+          raw: Json | null
+          realm: string
+          required_level: number | null
+          slot: string
+          source_type: string | null
+          weapon_damage_type: string | null
+          weapon_dps: number | null
+          weapon_speed: number | null
+          weapon_type: string | null
+        }
+        Insert: {
+          armor_af?: number | null
+          armor_type?: string | null
+          bonus_level?: number | null
+          class_restriction?: string | null
+          created_at?: string
+          effects?: Json
+          external_id?: string | null
+          id?: string
+          item_level?: number | null
+          level?: number | null
+          name: string
+          online_url?: string | null
+          origin?: string | null
+          quality?: number | null
+          raw?: Json | null
+          realm: string
+          required_level?: number | null
+          slot: string
+          source_type?: string | null
+          weapon_damage_type?: string | null
+          weapon_dps?: number | null
+          weapon_speed?: number | null
+          weapon_type?: string | null
+        }
+        Update: {
+          armor_af?: number | null
+          armor_type?: string | null
+          bonus_level?: number | null
+          class_restriction?: string | null
+          created_at?: string
+          effects?: Json
+          external_id?: string | null
+          id?: string
+          item_level?: number | null
+          level?: number | null
+          name?: string
+          online_url?: string | null
+          origin?: string | null
+          quality?: number | null
+          raw?: Json | null
+          realm?: string
+          required_level?: number | null
+          slot?: string
+          source_type?: string | null
+          weapon_damage_type?: string | null
+          weapon_dps?: number | null
+          weapon_speed?: number | null
+          weapon_type?: string | null
+        }
+        Relationships: []
+      }
+      saved_templates: {
+        Row: {
+          class_name: string | null
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          realm: string
+          slots: Json
+          updated_at: string
+        }
+        Insert: {
+          class_name?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          realm: string
+          slots?: Json
+          updated_at?: string
+        }
+        Update: {
+          class_name?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          realm?: string
+          slots?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
