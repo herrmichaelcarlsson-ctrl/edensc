@@ -235,8 +235,10 @@ function BuilderPage() {
                   key={s.key}
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
+                  gems={spellcraft[s.key]}
                   onPick={() => setPickerSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
+                  onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
               ))}
             </div>
@@ -249,8 +251,10 @@ function BuilderPage() {
                   key={s.key}
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
+                  gems={spellcraft[s.key]}
                   onPick={() => setPickerSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
+                  onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
               ))}
             </div>
@@ -263,8 +267,10 @@ function BuilderPage() {
                   key={s.key}
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
+                  gems={spellcraft[s.key]}
                   onPick={() => setPickerSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
+                  onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
               ))}
             </div>
@@ -273,8 +279,15 @@ function BuilderPage() {
 
         {/* Stats panel */}
         <aside className="lg:sticky lg:top-[68px] lg:self-start">
-          <Card className="p-5 bg-card/80 backdrop-blur">
+          <Card className="p-5 bg-card/80 backdrop-blur space-y-5">
             <StatsPanel agg={agg} />
+            <div className="border-t border-border/60 pt-4">
+              <SuggestionsPanel
+                result={suggestions}
+                totalGemSlots={gemTotals.slotsAvail}
+                totalGemUsed={gemTotals.used}
+              />
+            </div>
           </Card>
         </aside>
       </main>
@@ -286,6 +299,18 @@ function BuilderPage() {
         realm={realm}
         className={className}
         onPick={pickItem}
+      />
+
+      <SpellcraftDialog
+        open={spellcraftSlot !== null}
+        onClose={() => setSpellcraftSlot(null)}
+        slot={spellcraftSlot}
+        item={spellcraftSlot ? itemsBySlot[spellcraftSlot] : undefined}
+        gems={spellcraftSlot ? (spellcraft[spellcraftSlot] ?? []) : []}
+        onChange={(gs) => {
+          if (!spellcraftSlot) return;
+          setSpellcraft((sc) => ({ ...sc, [spellcraftSlot]: gs }));
+        }}
       />
     </div>
   );
