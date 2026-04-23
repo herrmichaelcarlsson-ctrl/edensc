@@ -1,33 +1,56 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Gem } from "lucide-react";
 import type { DBItem, SlotKey } from "@/lib/daoc/types";
 import { SLOT_BY_KEY } from "@/lib/daoc/slots";
+import { isCraftable, inspectGems, MAX_GEMS_PER_ITEM, type GemSet } from "@/lib/daoc/spellcraft";
+import { cn } from "@/lib/utils";
 
 interface Props {
   slotKey: SlotKey;
   item?: DBItem;
+  gems?: GemSet;
   onPick: () => void;
   onClear: () => void;
+  onSpellcraft?: () => void;
 }
 
-export function SlotCard({ slotKey, item, onPick, onClear }: Props) {
+export function SlotCard({ slotKey, item, gems = [], onPick, onClear, onSpellcraft }: Props) {
   const def = SLOT_BY_KEY[slotKey];
+  const craftable = isCraftable(item);
+  const status = inspectGems(gems);
   return (
     <div className="rounded-md border border-border bg-card/60 backdrop-blur-sm hover:border-primary/40 transition-colors">
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/60">
         <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
           {def.label}
         </span>
-        {item && (
-          <button
-            onClick={onClear}
-            className="text-muted-foreground hover:text-destructive transition-colors"
-            aria-label="Clear slot"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        )}
+        <div className="flex items-center gap-1.5">
+          {item && craftable && onSpellcraft && (
+            <button
+              onClick={onSpellcraft}
+              className={cn(
+                "flex items-center gap-1 text-[10px] tabular-nums px-1.5 py-0.5 rounded transition-colors",
+                status.used > 0 ? "text-primary hover:bg-primary/10" : "text-muted-foreground hover:text-primary",
+                status.overcharge && "text-status-waste",
+              )}
+              aria-label="Spellcraft"
+              title="Spellcraft this item"
+            >
+              <Gem className="h-3 w-3" />
+              {status.used}/{MAX_GEMS_PER_ITEM}
+            </button>
+          )}
+          {item && (
+            <button
+              onClick={onClear}
+              className="text-muted-foreground hover:text-destructive transition-colors"
+              aria-label="Clear slot"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
       </div>
       <button
         onClick={onPick}
