@@ -1,5 +1,6 @@
 import type { DBItem, ItemEffect, SlotKey, TemplateSlots } from "./types";
 import { CAPS, KNOWN_EFFECT_IDS, type CapDef } from "./caps";
+import { gemsToEffects, type SpellcraftMap } from "./spellcraft";
 
 export type StatStatus = "missing" | "near" | "capped" | "waste" | "neutral";
 
@@ -37,6 +38,7 @@ function statusFor(current: number, effectiveCap: number, kind: CapDef["kind"]):
 
 export function aggregate(
   itemsBySlot: Partial<Record<SlotKey, DBItem | undefined>>,
+  spellcraft: SpellcraftMap = {},
 ): AggregateResult {
   const totals = new Map<string, number>();
 
@@ -45,6 +47,9 @@ export function aggregate(
     if (!item) continue;
     for (const eff of item.effects ?? []) {
       totals.set(eff.id, (totals.get(eff.id) ?? 0) + (eff.value ?? 0));
+    }
+    for (const eff of gemsToEffects(spellcraft[slot])) {
+      totals.set(eff.id, (totals.get(eff.id) ?? 0) + eff.value);
     }
   }
 

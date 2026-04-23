@@ -1,4 +1,5 @@
 import type { Realm, TemplateSlots } from "./types";
+import type { SpellcraftMap } from "./spellcraft";
 
 const KEY = "daoc-template-builder:state:v1";
 
@@ -7,6 +8,7 @@ export interface PersistedState {
   className: string | null;
   slots: TemplateSlots;
   templateName: string;
+  spellcraft?: SpellcraftMap;
 }
 
 export function loadState(): PersistedState | null {
