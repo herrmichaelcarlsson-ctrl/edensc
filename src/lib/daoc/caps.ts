@@ -26,8 +26,9 @@ export interface CapDef {
 const stat = (label: string, id: string, capId?: string): CapDef => ({
   label,
   effectIds: [id],
-  itemCap: 101,
-  hardCap: 101 + 26, // can extend via cap bonuses
+  // Base item cap is 75. +X Cap items raise it up to +26 (hard cap 101).
+  itemCap: 75,
+  hardCap: 75 + 26,
   capBonusEffectIds: capId ? [capId] : [],
   maxCapBonus: 26,
   kind: "stat",

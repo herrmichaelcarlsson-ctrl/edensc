@@ -8,9 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { ItemPickerDialog } from "@/components/builder/ItemPickerDialog";
 import { SlotCard } from "@/components/builder/SlotCard";
 import { StatsPanel } from "@/components/builder/StatsPanel";
+import { SpellcraftDialog } from "@/components/builder/SpellcraftDialog";
+import { SuggestionsPanel } from "@/components/builder/SuggestionsPanel";
 import { SLOTS } from "@/lib/daoc/slots";
 import type { DBItem, Realm, SlotKey, TemplateSlots } from "@/lib/daoc/types";
 import { aggregate } from "@/lib/daoc/aggregate";
+import { isCraftable, inspectGems, type SpellcraftMap } from "@/lib/daoc/spellcraft";
+import { suggestGems } from "@/lib/daoc/suggest";
 import { loadState, saveState } from "@/lib/daoc/storage";
 import { exportTemplateText } from "@/lib/daoc/export";
 import { ArrowLeft, Copy, Save, Trash2, Download, Upload } from "lucide-react";
@@ -34,6 +38,8 @@ function BuilderPage() {
   const [templateName, setTemplateName] = useState("Untitled Template");
   const [slots, setSlots] = useState<TemplateSlots>({});
   const [pickerSlot, setPickerSlot] = useState<SlotKey | null>(null);
+  const [spellcraftSlot, setSpellcraftSlot] = useState<SlotKey | null>(null);
+  const [spellcraft, setSpellcraft] = useState<SpellcraftMap>({});
   const [itemsCache, setItemsCache] = useState<Record<string, DBItem>>({});
 
   // Initial load from localStorage
@@ -47,6 +53,7 @@ function BuilderPage() {
     setClassName(s.className);
     setSlots(s.slots ?? {});
     setTemplateName(s.templateName ?? "Untitled Template");
+    setSpellcraft(s.spellcraft ?? {});
   }, [navigate]);
 
   // Resolve item ids in slots → fetch any missing
@@ -72,8 +79,8 @@ function BuilderPage() {
   // Persist
   useEffect(() => {
     if (!realm) return;
-    saveState({ realm, className, slots, templateName });
-  }, [realm, className, slots, templateName]);
+    saveState({ realm, className, slots, templateName, spellcraft });
+  }, [realm, className, slots, templateName, spellcraft]);
 
   const itemsBySlot = useMemo(() => {
     const map: Partial<Record<SlotKey, DBItem | undefined>> = {};
@@ -84,7 +91,20 @@ function BuilderPage() {
     return map;
   }, [slots, itemsCache]);
 
-  const agg = useMemo(() => aggregate(itemsBySlot), [itemsBySlot]);
+  const agg = useMemo(() => aggregate(itemsBySlot, spellcraft), [itemsBySlot, spellcraft]);
+  const suggestions = useMemo(() => suggestGems(agg), [agg]);
+
+  const gemTotals = useMemo(() => {
+    let used = 0;
+    let slotsAvail = 0;
+    for (const k of Object.keys(itemsBySlot) as SlotKey[]) {
+      if (isCraftable(itemsBySlot[k])) {
+        slotsAvail += 4;
+        used += inspectGems(spellcraft[k]).used;
+      }
+    }
+    return { used, slotsAvail };
+  }, [itemsBySlot, spellcraft]);
 
   function pickItem(item: DBItem) {
     if (!pickerSlot) return;
@@ -98,11 +118,17 @@ function BuilderPage() {
       delete n[key];
       return n;
     });
+    setSpellcraft((sc) => {
+      const n = { ...sc };
+      delete n[key];
+      return n;
+    });
   }
 
   function clearAll() {
     if (!confirm("Clear all slots?")) return;
     setSlots({});
+    setSpellcraft({});
     toast.success("Template cleared");
   }
 
@@ -209,8 +235,10 @@ function BuilderPage() {
                   key={s.key}
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
+                  gems={spellcraft[s.key]}
                   onPick={() => setPickerSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
+                  onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
               ))}
             </div>
@@ -223,8 +251,10 @@ function BuilderPage() {
                   key={s.key}
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
+                  gems={spellcraft[s.key]}
                   onPick={() => setPickerSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
+                  onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
               ))}
             </div>
@@ -237,8 +267,10 @@ function BuilderPage() {
                   key={s.key}
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
+                  gems={spellcraft[s.key]}
                   onPick={() => setPickerSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
+                  onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
               ))}
             </div>
@@ -247,8 +279,15 @@ function BuilderPage() {
 
         {/* Stats panel */}
         <aside className="lg:sticky lg:top-[68px] lg:self-start">
-          <Card className="p-5 bg-card/80 backdrop-blur">
+          <Card className="p-5 bg-card/80 backdrop-blur space-y-5">
             <StatsPanel agg={agg} />
+            <div className="border-t border-border/60 pt-4">
+              <SuggestionsPanel
+                result={suggestions}
+                totalGemSlots={gemTotals.slotsAvail}
+                totalGemUsed={gemTotals.used}
+              />
+            </div>
           </Card>
         </aside>
       </main>
@@ -260,6 +299,18 @@ function BuilderPage() {
         realm={realm}
         className={className}
         onPick={pickItem}
+      />
+
+      <SpellcraftDialog
+        open={spellcraftSlot !== null}
+        onClose={() => setSpellcraftSlot(null)}
+        slot={spellcraftSlot}
+        item={spellcraftSlot ? itemsBySlot[spellcraftSlot] : undefined}
+        gems={spellcraftSlot ? (spellcraft[spellcraftSlot] ?? []) : []}
+        onChange={(gs) => {
+          if (!spellcraftSlot) return;
+          setSpellcraft((sc) => ({ ...sc, [spellcraftSlot]: gs }));
+        }}
       />
     </div>
   );
