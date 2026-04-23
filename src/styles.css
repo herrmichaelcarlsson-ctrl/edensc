@@ -46,6 +46,16 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-status-capped: var(--status-capped);
+  --color-status-near: var(--status-near);
+  --color-status-missing: var(--status-missing);
+  --color-status-waste: var(--status-waste);
+  --color-status-neutral: var(--status-neutral);
+  --color-realm-albion: var(--realm-albion);
+  --color-realm-hibernia: var(--realm-hibernia);
+  --color-realm-midgard: var(--realm-midgard);
+  --font-display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -63,25 +73,39 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  /* DAoC Template Builder — dark, parchment-on-iron palette */
+  --background: oklch(0.16 0.015 250);
+  --foreground: oklch(0.94 0.01 90);
+  --card: oklch(0.20 0.018 250);
+  --card-foreground: oklch(0.94 0.01 90);
+  --popover: oklch(0.18 0.018 250);
+  --popover-foreground: oklch(0.94 0.01 90);
+  --primary: oklch(0.78 0.16 75);
+  --primary-foreground: oklch(0.18 0.02 60);
+  --secondary: oklch(0.26 0.022 250);
+  --secondary-foreground: oklch(0.94 0.01 90);
+  --muted: oklch(0.24 0.018 250);
+  --muted-foreground: oklch(0.68 0.02 90);
+  --accent: oklch(0.30 0.04 250);
+  --accent-foreground: oklch(0.95 0.01 90);
+  --destructive: oklch(0.62 0.22 25);
+  --destructive-foreground: oklch(0.98 0.01 90);
+  --border: oklch(0.30 0.02 250);
+  --input: oklch(0.24 0.018 250);
+  --ring: oklch(0.78 0.16 75);
+
+  /* Stat status colors */
+  --status-capped: oklch(0.72 0.18 145);
+  --status-near: oklch(0.82 0.17 95);
+  --status-missing: oklch(0.65 0.22 25);
+  --status-waste: oklch(0.72 0.18 50);
+  --status-neutral: oklch(0.55 0.02 90);
+
+  /* Realm colors */
+  --realm-albion: oklch(0.65 0.20 25);
+  --realm-hibernia: oklch(0.65 0.18 145);
+  --realm-midgard: oklch(0.68 0.16 240);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +164,15 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-body);
+    background-image:
+      radial-gradient(ellipse at top, oklch(0.22 0.03 250 / 0.8), transparent 60%),
+      radial-gradient(ellipse at bottom, oklch(0.18 0.02 60 / 0.4), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
   }
 }
