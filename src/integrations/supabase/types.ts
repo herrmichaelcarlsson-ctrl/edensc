@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      feature_request_votes: {
+        Row: {
+          created_at: string
+          id: string
+          request_id: string
+          voter_key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_id: string
+          voter_key: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_id?: string
+          voter_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_request_votes_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "feature_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      feature_requests: {
+        Row: {
+          author_name: string | null
+          created_at: string
+          description: string | null
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          vote_count: number
+        }
+        Insert: {
+          author_name?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          vote_count?: number
+        }
+        Update: {
+          author_name?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          vote_count?: number
+        }
+        Relationships: []
+      }
       items: {
         Row: {
           armor_af: number | null
