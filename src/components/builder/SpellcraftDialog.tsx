@@ -2,8 +2,7 @@ import { useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Plus, AlertTriangle } from "lucide-react";
 import {
   GEMS,
@@ -36,12 +35,42 @@ const CATEGORIES: { key: GemCategory; label: string }[] = [
 
 export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: Props) {
   const [category, setCategory] = useState<GemCategory>("stat");
+  const [effectId, setEffectId] = useState<string>("");
+  const [gemId, setGemId] = useState<string>("");
 
   const status = useMemo(() => inspectGems(gems), [gems]);
-  const filtered = useMemo(
-    () => GEMS.filter((g) => g.category === category).sort((a, b) => a.label.localeCompare(b.label) || a.tier - b.tier),
-    [category],
-  );
+
+  // Group gems in current category by effectId (the "stat" choice)
+  const effectsForCategory = useMemo(() => {
+    const map = new Map<string, { id: string; label: string }>();
+    for (const g of GEMS) {
+      if (g.category !== category) continue;
+      if (!map.has(g.effectId)) {
+        // Strip the value/sign from gem label to get the bare stat name
+        const label = g.label.replace(/^\+\d+%?\s*/, "").trim();
+        map.set(g.effectId, { id: g.effectId, label });
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [category]);
+
+  const tiersForEffect = useMemo(() => {
+    if (!effectId) return [];
+    return GEMS.filter((g) => g.category === category && g.effectId === effectId).sort(
+      (a, b) => a.tier - b.tier,
+    );
+  }, [category, effectId]);
+
+  // Reset selections when category changes
+  function changeCategory(c: GemCategory) {
+    setCategory(c);
+    setEffectId("");
+    setGemId("");
+  }
+  function changeEffect(id: string) {
+    setEffectId(id);
+    setGemId("");
+  }
 
   function addGem(gemId: string) {
     if (gems.length >= MAX_GEMS_PER_ITEM) return;
@@ -51,9 +80,19 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
     onChange(gems.filter((_, i) => i !== idx));
   }
 
+  function confirmAdd() {
+    if (!gemId) return;
+    addGem(gemId);
+    setGemId("");
+  }
+
+  const selectedGem = gemId ? GEM_BY_ID[gemId] : undefined;
+  const wouldOver = selectedGem ? status.imbueUsed + selectedGem.cost > SAFE_IMBUE_LIMIT : false;
+  const noSlot = status.remaining === 0;
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-display flex items-center gap-2">
             Spellcraft
@@ -116,44 +155,102 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
           </div>
         </div>
 
-        {/* Gem catalog */}
-        <Tabs value={category} onValueChange={(v) => setCategory(v as GemCategory)}>
-          <TabsList className="w-full">
+        {/* Gem builder — dropdown style */}
+        <div className="space-y-2 rounded-md border border-border bg-muted/20 p-3">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Add gem</div>
+
+          {/* Category */}
+          <div className="grid grid-cols-5 gap-1">
             {CATEGORIES.map((c) => (
-              <TabsTrigger key={c.key} value={c.key} className="flex-1 text-xs">{c.label}</TabsTrigger>
+              <button
+                key={c.key}
+                onClick={() => changeCategory(c.key)}
+                className={cn(
+                  "text-[11px] py-1 rounded border transition-colors",
+                  category === c.key
+                    ? "border-primary/60 bg-primary/10 text-foreground"
+                    : "border-border bg-card/40 text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {c.label}
+              </button>
             ))}
-          </TabsList>
-          {CATEGORIES.map((c) => (
-            <TabsContent key={c.key} value={c.key} className="mt-2">
-              <ScrollArea className="h-[280px] pr-3">
-                <div className="grid grid-cols-2 gap-1">
-                  {filtered.map((g) => {
-                    const wouldOver = status.imbueUsed + g.cost > SAFE_IMBUE_LIMIT;
-                    const noSlot = status.remaining === 0;
+          </div>
+
+          {/* Stat + value selectors */}
+          <div className="grid grid-cols-[1fr_1fr_auto] gap-2 items-end pt-1">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                {category === "resist" ? "Resist" : category === "hp" || category === "power" ? "Type" : "Stat"}
+              </label>
+              <Select value={effectId} onValueChange={changeEffect}>
+                <SelectTrigger className="h-9 text-xs">
+                  <SelectValue placeholder="Välj…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {effectsForCategory.map((e) => (
+                    <SelectItem key={e.id} value={e.id} className="text-xs">
+                      {e.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Värde</label>
+              <Select value={gemId} onValueChange={setGemId} disabled={!effectId}>
+                <SelectTrigger className="h-9 text-xs">
+                  <SelectValue placeholder={effectId ? "Välj värde…" : "Välj stat först"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {tiersForEffect.map((g) => {
+                    const over = status.imbueUsed + g.cost > SAFE_IMBUE_LIMIT;
                     return (
-                      <button
-                        key={g.id}
-                        disabled={noSlot}
-                        onClick={() => addGem(g.id)}
-                        className={cn(
-                          "text-left text-xs px-2 py-1.5 rounded border border-border hover:border-primary/50 transition-colors flex items-center justify-between",
-                          noSlot && "opacity-40 cursor-not-allowed",
-                          wouldOver && !noSlot && "border-status-waste/40",
-                        )}
-                      >
-                        <span className="truncate">{g.label}</span>
-                        <span className="flex items-center gap-1.5 ml-2 shrink-0">
-                          <Badge variant="outline" className="text-[9px] py-0">{g.cost}p</Badge>
-                          <Plus className="h-3 w-3 text-muted-foreground" />
+                      <SelectItem key={g.id} value={g.id} className="text-xs">
+                        <span className="flex items-center gap-2">
+                          <span>+{g.value}{category === "resist" || category === "power" ? "%" : ""}</span>
+                          <span className="text-muted-foreground">·</span>
+                          <span className={cn("text-muted-foreground", over && "text-status-waste")}>
+                            {g.cost} imbue
+                          </span>
+                          <span className="text-muted-foreground">·</span>
+                          <span className="text-muted-foreground">T{g.tier}</span>
                         </span>
-                      </button>
+                      </SelectItem>
                     );
                   })}
-                </div>
-              </ScrollArea>
-            </TabsContent>
-          ))}
-        </Tabs>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              size="sm"
+              onClick={confirmAdd}
+              disabled={!gemId || noSlot}
+              className="h-9"
+            >
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Lägg till
+            </Button>
+          </div>
+
+          {selectedGem && (
+            <div className="flex items-center gap-2 text-[11px] pt-1">
+              <Badge variant="outline" className="text-[10px]">{selectedGem.label}</Badge>
+              <span className={cn("text-muted-foreground", wouldOver && "text-status-waste")}>
+                Cost {selectedGem.cost}p → totalt {status.imbueUsed + selectedGem.cost}/{SAFE_IMBUE_LIMIT}
+                {wouldOver && " — overcharge"}
+              </span>
+            </div>
+          )}
+          {noSlot && (
+            <div className="text-[11px] text-status-waste flex items-center gap-1.5">
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Alla 4 gem-slots är fulla
+            </div>
+          )}
+        </div>
 
         <div className="flex justify-end pt-2">
           <Button onClick={onClose} variant="secondary" size="sm">Done</Button>
