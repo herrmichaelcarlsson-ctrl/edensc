@@ -19,7 +19,7 @@ import { isCraftable, inspectGems, type SpellcraftMap } from "@/lib/daoc/spellcr
 import { suggestGems } from "@/lib/daoc/suggest";
 import { loadState, saveState } from "@/lib/daoc/storage";
 import { exportTemplateText } from "@/lib/daoc/export";
-import { ArrowLeft, Copy, Save, Trash2, Download, Upload } from "lucide-react";
+import { ArrowLeft, Copy, Save, Trash2, Download, Upload, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -255,6 +255,12 @@ function BuilderPage() {
           <Button size="sm" variant="ghost" onClick={clearAll}>
             <Trash2 className="h-4 w-4 mr-1.5" /> Clear
           </Button>
+          <Link
+            to="/feedback"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground px-2 py-1.5 rounded"
+          >
+            <MessageSquare className="h-4 w-4 mr-1.5" /> Önskemål
+          </Link>
           <Button size="sm" onClick={saveToCloud}>
             <Save className="h-4 w-4 mr-1.5" /> Save
           </Button>
