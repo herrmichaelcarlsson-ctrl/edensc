@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { itemAllowedForClass } from "@/lib/daoc/classes";
+import { itemAllowedForClass, armorAllowedForClass } from "@/lib/daoc/classes";
 import type { DBItem, Realm, SlotKey } from "@/lib/daoc/types";
 import { SLOT_BY_KEY } from "@/lib/daoc/slots";
 import { Loader2 } from "lucide-react";
@@ -55,6 +55,7 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
     const q = search.trim().toLowerCase();
     return items
       .filter((i) => itemAllowedForClass(i.class_restriction, className))
+      .filter((i) => armorAllowedForClass(i.armor_type, className))
       .filter((i) => !q || i.name.toLowerCase().includes(q))
       .sort((a, b) => (b.bonus_level ?? 0) - (a.bonus_level ?? 0))
       .slice(0, 300);
