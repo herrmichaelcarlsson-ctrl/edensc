@@ -10,6 +10,8 @@ import { SlotCard } from "@/components/builder/SlotCard";
 import { StatsPanel } from "@/components/builder/StatsPanel";
 import { SpellcraftDialog } from "@/components/builder/SpellcraftDialog";
 import { SuggestionsPanel } from "@/components/builder/SuggestionsPanel";
+import { SlotActionDialog } from "@/components/builder/SlotActionDialog";
+import { CustomItemDialog } from "@/components/builder/CustomItemDialog";
 import { SLOTS } from "@/lib/daoc/slots";
 import type { DBItem, Realm, SlotKey, TemplateSlots } from "@/lib/daoc/types";
 import { aggregate } from "@/lib/daoc/aggregate";
@@ -37,8 +39,10 @@ function BuilderPage() {
   const [className, setClassName] = useState<string | null>(null);
   const [templateName, setTemplateName] = useState("Untitled Template");
   const [slots, setSlots] = useState<TemplateSlots>({});
+  const [actionSlot, setActionSlot] = useState<SlotKey | null>(null);
   const [pickerSlot, setPickerSlot] = useState<SlotKey | null>(null);
   const [spellcraftSlot, setSpellcraftSlot] = useState<SlotKey | null>(null);
+  const [customItemSlot, setCustomItemSlot] = useState<SlotKey | null>(null);
   const [spellcraft, setSpellcraft] = useState<SpellcraftMap>({});
   const [itemsCache, setItemsCache] = useState<Record<string, DBItem>>({});
 
@@ -110,6 +114,38 @@ function BuilderPage() {
     if (!pickerSlot) return;
     setItemsCache((c) => ({ ...c, [item.id]: item }));
     setSlots((s) => ({ ...s, [pickerSlot]: item.id }));
+  }
+
+  function createCustomItem(slotKey: SlotKey, name: string) {
+    const slotDef = SLOTS.find((entry) => entry.key === slotKey);
+    if (!slotDef || !realm) return;
+    const id = `custom:${slotKey}:${crypto.randomUUID()}`;
+    const item: DBItem = {
+      id,
+      external_id: null,
+      name,
+      realm,
+      slot: slotDef.dbSlots[0] ?? slotKey,
+      item_level: 51,
+      bonus_level: 51,
+      required_level: 50,
+      quality: 100,
+      level: 51,
+      class_restriction: className,
+      armor_type: null,
+      armor_af: null,
+      weapon_type: null,
+      weapon_damage_type: null,
+      weapon_dps: null,
+      weapon_speed: null,
+      origin: "CRAFTED",
+      source_type: "CRAFTED",
+      online_url: null,
+      effects: [],
+    };
+    setItemsCache((c) => ({ ...c, [item.id]: item }));
+    setSlots((s) => ({ ...s, [slotKey]: item.id }));
+    setSpellcraft((sc) => ({ ...sc, [slotKey]: sc[slotKey] ?? [] }));
   }
 
   function clearSlot(key: SlotKey) {
@@ -236,7 +272,7 @@ function BuilderPage() {
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
                   gems={spellcraft[s.key]}
-                  onPick={() => setPickerSlot(s.key)}
+                  onPick={() => setActionSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
                   onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
@@ -252,7 +288,7 @@ function BuilderPage() {
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
                   gems={spellcraft[s.key]}
-                  onPick={() => setPickerSlot(s.key)}
+                  onPick={() => setActionSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
                   onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
@@ -268,7 +304,7 @@ function BuilderPage() {
                   slotKey={s.key}
                   item={itemsBySlot[s.key]}
                   gems={spellcraft[s.key]}
-                  onPick={() => setPickerSlot(s.key)}
+                  onPick={() => setActionSlot(s.key)}
                   onClear={() => clearSlot(s.key)}
                   onSpellcraft={() => setSpellcraftSlot(s.key)}
                 />
@@ -292,6 +328,31 @@ function BuilderPage() {
         </aside>
       </main>
 
+      <SlotActionDialog
+        open={actionSlot !== null}
+        onClose={() => setActionSlot(null)}
+        slotLabel={actionSlot ? (SLOTS.find((s) => s.key === actionSlot)?.label ?? actionSlot) : ""}
+        onChooseItem={() => {
+          if (!actionSlot) return;
+          setPickerSlot(actionSlot);
+          setActionSlot(null);
+        }}
+        onChooseSpellcraft={() => {
+          if (!actionSlot) return;
+          const existing = itemsBySlot[actionSlot];
+          if (!existing) {
+            createCustomItem(actionSlot, `Crafted ${SLOTS.find((s) => s.key === actionSlot)?.label ?? "Item"}`);
+          }
+          setSpellcraftSlot(actionSlot);
+          setActionSlot(null);
+        }}
+        onChooseCustom={() => {
+          if (!actionSlot) return;
+          setCustomItemSlot(actionSlot);
+          setActionSlot(null);
+        }}
+      />
+
       <ItemPickerDialog
         open={pickerSlot !== null}
         onClose={() => setPickerSlot(null)}
@@ -299,6 +360,18 @@ function BuilderPage() {
         realm={realm}
         className={className}
         onPick={pickItem}
+      />
+
+      <CustomItemDialog
+        open={customItemSlot !== null}
+        onClose={() => setCustomItemSlot(null)}
+        slotLabel={customItemSlot ? (SLOTS.find((s) => s.key === customItemSlot)?.label ?? customItemSlot) : ""}
+        defaultName={customItemSlot ? `Custom ${SLOTS.find((s) => s.key === customItemSlot)?.label ?? "Item"}` : "Custom Item"}
+        onSave={(name) => {
+          if (!customItemSlot) return;
+          createCustomItem(customItemSlot, name);
+          setCustomItemSlot(null);
+        }}
       />
 
       <SpellcraftDialog
