@@ -32,11 +32,15 @@ export const Route = createRootRoute({
       { title: "Eden Template Forge — DAoC Template Builder" },
       { name: "description", content: "Build, calculate and optimize Dark Age of Camelot character templates." },
       { name: "author", content: "Eden Template Forge" },
-      { property: "og:title", content: "Eden Template Forge" },
-      { property: "og:description", content: "DAoC Template Builder & Spellcraft Calculator" },
+      { property: "og:title", content: "Eden Template Forge — DAoC Template Builder" },
+      { property: "og:description", content: "Build, calculate and optimize Dark Age of Camelot character templates." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Eden Template Forge — DAoC Template Builder" },
+      { name: "twitter:description", content: "Build, calculate and optimize Dark Age of Camelot character templates." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/432e6fe1-f5b1-49ac-8f17-d541f1695ca9/id-preview-699bc50a--1671f53d-6089-43f8-a526-bf1549427c85.lovable.app-1777078210852.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/432e6fe1-f5b1-49ac-8f17-d541f1695ca9/id-preview-699bc50a--1671f53d-6089-43f8-a526-bf1549427c85.lovable.app-1777078210852.png" },
     ],
     links: [
       {
