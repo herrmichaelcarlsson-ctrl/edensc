@@ -136,24 +136,7 @@ function buildGems(): GemDef[] {
       });
     }
   }
-  for (const s of STATS) {
-    for (const t of CAP_TABLE) {
-      const quality = QUALITIES[t.tier - 1];
-      const family = `${s.label} Cap Gem`;
-      out.push({
-        id: `cap_${s.id.toLowerCase()}_t${t.tier}`,
-        label: `+${t.value} ${s.label} Cap`,
-        effectId: `CAP_${s.id}`,
-        value: t.value,
-        cost: t.cost,
-        category: "cap",
-        tier: t.tier,
-        family,
-        quality,
-        gemName: `${quality} ${family}`,
-      });
-    }
-  }
+  // Stat caps cannot be spellcrafted — they only appear on items (drops/crafted bases).
   for (const t of [
     { tier: 1, cost: 1, value: 12 },
     { tier: 2, cost: 2, value: 20 },
