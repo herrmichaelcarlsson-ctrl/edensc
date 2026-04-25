@@ -19,9 +19,10 @@ import { isCraftable, inspectGems, type SpellcraftMap } from "@/lib/daoc/spellcr
 import { suggestGems } from "@/lib/daoc/suggest";
 import { loadState, saveState } from "@/lib/daoc/storage";
 import { exportTemplateText } from "@/lib/daoc/export";
-import { ArrowLeft, Copy, Save, Trash2, Download, Upload, MessageSquare } from "lucide-react";
+import { ArrowLeft, Copy, Save, Trash2, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import type { ItemEffect } from "@/lib/daoc/types";
 
 export const Route = createFileRoute("/builder")({
   head: () => ({
@@ -116,10 +117,47 @@ function BuilderPage() {
     setSlots((s) => ({ ...s, [pickerSlot]: item.id }));
   }
 
-  function createCustomItem(slotKey: SlotKey, name: string) {
+  function createCustomItem(slotKey: SlotKey, name: string, effects: ItemEffect[] = []) {
     const slotDef = SLOTS.find((entry) => entry.key === slotKey);
     if (!slotDef || !realm) return;
     const id = `custom:${slotKey}:${crypto.randomUUID()}`;
+    const item: DBItem = {
+      id,
+      external_id: null,
+      name,
+      realm,
+      slot: slotDef.dbSlots[0] ?? slotKey,
+      item_level: 51,
+      bonus_level: 51,
+      required_level: 50,
+      quality: 100,
+      level: 51,
+      class_restriction: className,
+      armor_type: null,
+      armor_af: null,
+      weapon_type: null,
+      weapon_damage_type: null,
+      weapon_dps: null,
+      weapon_speed: null,
+      origin: "CUSTOM",
+      source_type: "CUSTOM",
+      online_url: null,
+      effects,
+    };
+    setItemsCache((c) => ({ ...c, [item.id]: item }));
+    setSlots((s) => ({ ...s, [slotKey]: item.id }));
+    // Custom items: clear any spellcraft for this slot to avoid stale gems
+    setSpellcraft((sc) => {
+      const n = { ...sc };
+      delete n[slotKey];
+      return n;
+    });
+  }
+
+  function createCraftedShell(slotKey: SlotKey, name: string) {
+    const slotDef = SLOTS.find((entry) => entry.key === slotKey);
+    if (!slotDef || !realm) return;
+    const id = `crafted:${slotKey}:${crypto.randomUUID()}`;
     const item: DBItem = {
       id,
       external_id: null,
@@ -255,12 +293,6 @@ function BuilderPage() {
           <Button size="sm" variant="ghost" onClick={clearAll}>
             <Trash2 className="h-4 w-4 mr-1.5" /> Clear
           </Button>
-          <Link
-            to="/feedback"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground px-2 py-1.5 rounded"
-          >
-            <MessageSquare className="h-4 w-4 mr-1.5" /> Önskemål
-          </Link>
           <Button size="sm" onClick={saveToCloud}>
             <Save className="h-4 w-4 mr-1.5" /> Save
           </Button>
@@ -347,7 +379,7 @@ function BuilderPage() {
           if (!actionSlot) return;
           const existing = itemsBySlot[actionSlot];
           if (!existing) {
-            createCustomItem(actionSlot, `Crafted ${SLOTS.find((s) => s.key === actionSlot)?.label ?? "Item"}`);
+            createCraftedShell(actionSlot, `Crafted ${SLOTS.find((s) => s.key === actionSlot)?.label ?? "Item"}`);
           }
           setSpellcraftSlot(actionSlot);
           setActionSlot(null);
@@ -373,9 +405,9 @@ function BuilderPage() {
         onClose={() => setCustomItemSlot(null)}
         slotLabel={customItemSlot ? (SLOTS.find((s) => s.key === customItemSlot)?.label ?? customItemSlot) : ""}
         defaultName={customItemSlot ? `Custom ${SLOTS.find((s) => s.key === customItemSlot)?.label ?? "Item"}` : "Custom Item"}
-        onSave={(name) => {
+        onSave={(name, effects) => {
           if (!customItemSlot) return;
-          createCustomItem(customItemSlot, name);
+          createCustomItem(customItemSlot, name, effects);
           setCustomItemSlot(null);
         }}
       />
