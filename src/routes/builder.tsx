@@ -19,6 +19,7 @@ import { isCraftable, inspectGems, type SpellcraftMap } from "@/lib/daoc/spellcr
 import { suggestGems } from "@/lib/daoc/suggest";
 import { loadState, saveState } from "@/lib/daoc/storage";
 import { exportTemplateText } from "@/lib/daoc/export";
+import { importZenkcraftText } from "@/lib/daoc/import";
 import { ArrowLeft, Copy, Save, Trash2, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -220,9 +221,17 @@ function BuilderPage() {
 
   function exportText() {
     if (!realm) return;
-    const text = exportTemplateText(templateName, realm, className, itemsBySlot, agg);
+    const text = exportTemplateText(templateName, realm, className, itemsBySlot, agg, spellcraft);
     navigator.clipboard.writeText(text);
-    toast.success("Template copied to clipboard");
+    // Also offer a download for sharing with the spellcrafter
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${templateName.replace(/[^a-z0-9]+/gi, "_")}_Summary.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Template copied & downloaded");
   }
 
   function exportJson() {
@@ -241,8 +250,27 @@ function BuilderPage() {
     if (!f) return;
     const reader = new FileReader();
     reader.onload = () => {
+      const text = reader.result as string;
+      const isText = f.name.toLowerCase().endsWith(".txt") || /Character Summary for/i.test(text);
+      if (isText) {
+        try {
+          const r = importZenkcraftText(text, realm);
+          if (r.realm) setRealm(r.realm);
+          if (r.className) setClassName(r.className);
+          setTemplateName(r.templateName);
+          setItemsCache((c) => ({ ...c, ...r.items }));
+          setSlots(r.slots);
+          setSpellcraft(r.spellcraft);
+          toast.success(`Imported ${Object.keys(r.slots).length} items from summary`);
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to parse template summary");
+        }
+        e.target.value = "";
+        return;
+      }
       try {
-        const obj = JSON.parse(reader.result as string);
+        const obj = JSON.parse(text);
         if (obj.realm) setRealm(obj.realm);
         if (obj.className !== undefined) setClassName(obj.className);
         if (obj.slots) setSlots(obj.slots);
@@ -288,7 +316,7 @@ function BuilderPage() {
           </Button>
           <label className="inline-flex items-center text-sm cursor-pointer text-muted-foreground hover:text-foreground px-2 py-1.5 rounded">
             <Upload className="h-4 w-4 mr-1.5" /> Import
-            <input type="file" accept="application/json" onChange={importJson} className="hidden" />
+            <input type="file" accept="application/json,text/plain,.json,.txt" onChange={importJson} className="hidden" />
           </label>
           <Button size="sm" variant="ghost" onClick={clearAll}>
             <Trash2 className="h-4 w-4 mr-1.5" /> Clear
