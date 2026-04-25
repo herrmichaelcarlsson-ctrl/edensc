@@ -21,9 +21,9 @@ export interface FeatureRequest {
 
 const STATUS_META: Record<FeatureRequest["status"], { label: string; icon: typeof Clock; tone: string }> = {
   open: { label: "Open", icon: ListTodo, tone: "text-foreground" },
-  planned: { label: "Planerad", tone: "text-status-near", icon: Clock },
-  done: { label: "Klart", tone: "text-status-capped", icon: CheckCircle2 },
-  rejected: { label: "Avvisad", tone: "text-muted-foreground", icon: Clock },
+  planned: { label: "Planned", tone: "text-status-near", icon: Clock },
+  done: { label: "Done", tone: "text-status-capped", icon: CheckCircle2 },
+  rejected: { label: "Rejected", tone: "text-muted-foreground", icon: Clock },
 };
 
 interface Props {
@@ -55,7 +55,7 @@ export function FeatureRequestsBoard({ compact = false }: Props) {
       }).select("request_id").eq("voter_key", voterKey),
     ]);
     if (list.error) {
-      toast.error("Kunde inte hämta önskemål: " + list.error.message);
+      toast.error("Could not load requests: " + list.error.message);
       setItems([]);
     } else {
       const sorted = [...(list.data ?? [])].sort((a, b) => {
@@ -82,11 +82,11 @@ export function FeatureRequestsBoard({ compact = false }: Props) {
     e.preventDefault();
     const t = title.trim();
     if (t.length < 3) {
-      toast.error("Titeln måste vara minst 3 tecken");
+      toast.error("Title must be at least 3 characters");
       return;
     }
     if (t.length > 120) {
-      toast.error("Titeln får vara max 120 tecken");
+      toast.error("Title can be at most 120 characters");
       return;
     }
     setSubmitting(true);
@@ -100,12 +100,12 @@ export function FeatureRequestsBoard({ compact = false }: Props) {
     });
     setSubmitting(false);
     if (error) {
-      toast.error("Misslyckades: " + error.message);
+      toast.error("Failed: " + error.message);
       return;
     }
     setTitle("");
     setDescription("");
-    toast.success("Tack! Önskemålet är skickat.");
+    toast.success("Thanks! Your request was submitted.");
     refresh();
   }
 
@@ -127,13 +127,13 @@ export function FeatureRequestsBoard({ compact = false }: Props) {
         .eq("request_id", req.id)
         .eq("voter_key", voterKey);
       if (error) {
-        toast.error("Kunde inte ångra rösten");
+        toast.error("Could not remove vote");
         refresh();
       }
     } else {
       const { error } = await votesTbl.insert({ request_id: req.id, voter_key: voterKey });
       if (error) {
-        toast.error("Kunde inte rösta");
+        toast.error("Could not vote");
         refresh();
       }
     }
@@ -146,19 +146,19 @@ export function FeatureRequestsBoard({ compact = false }: Props) {
       <form onSubmit={submit} className="space-y-2 rounded-lg border border-border bg-card/60 p-4 backdrop-blur">
         <div className="flex items-center gap-2 text-sm font-medium">
           <MessageSquarePlus className="h-4 w-4 text-primary" />
-          Skicka önskemål
+          Submit a request
         </div>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Kort titel (t.ex. 'Lägg till auto-optimizer')"
+          placeholder="Short title (e.g. 'Add an auto-optimizer')"
           maxLength={120}
           required
         />
         <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Beskriv önskemålet (valfritt, max 2000 tecken)"
+          placeholder="Describe the request (optional, max 2000 chars)"
           maxLength={2000}
           rows={3}
         />
@@ -166,38 +166,38 @@ export function FeatureRequestsBoard({ compact = false }: Props) {
           <Input
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
-            placeholder="Ditt namn (valfritt)"
+            placeholder="Your name (optional)"
             maxLength={60}
             className="sm:max-w-xs"
           />
           <div className="flex-1" />
           <Button type="submit" size="sm" disabled={submitting}>
             {submitting && <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />}
-            Skicka
+            Submit
           </Button>
         </div>
       </form>
 
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm uppercase tracking-widest text-muted-foreground">
-          Önskemål ({items.length})
+          Requests ({items.length})
         </h3>
         <button
           type="button"
           className="text-xs text-muted-foreground hover:text-primary transition-colors"
           onClick={() => setShowDone((v) => !v)}
         >
-          {showDone ? "Dölj klara" : "Visa klara"}
+          {showDone ? "Hide done" : "Show done"}
         </button>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-8 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin mr-2" /> Laddar…
+          <Loader2 className="h-5 w-5 animate-spin mr-2" /> Loading…
         </div>
       ) : visible.length === 0 ? (
         <div className="rounded-md border border-dashed border-border p-6 text-center text-muted-foreground text-sm">
-          Inga önskemål ännu. Bli först!
+          No requests yet. Be the first!
         </div>
       ) : (
         <ul className="space-y-2">

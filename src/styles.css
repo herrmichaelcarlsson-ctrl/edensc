@@ -176,3 +176,30 @@
     letter-spacing: 0.02em;
   }
 }
+
+/* Slow Ken-Burns animation for the landing background image. */
+@keyframes realm-bg-drift {
+  0%   { transform: scale(1.05) translate(0, 0); }
+  50%  { transform: scale(1.12) translate(-1.5%, -1%); }
+  100% { transform: scale(1.05) translate(0, 0); }
+}
+
+.realm-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: realm-bg-drift 45s ease-in-out infinite;
+  will-change: transform;
+}
+
+.realm-bg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, oklch(0.10 0.02 250 / 0.45) 0%, oklch(0.10 0.02 250 / 0.85) 100%);
+  pointer-events: none;
+}

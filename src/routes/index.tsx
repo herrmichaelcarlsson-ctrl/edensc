@@ -6,6 +6,9 @@ import { CLASSES } from "@/lib/daoc/classes";
 import type { Realm } from "@/lib/daoc/types";
 import { saveState, loadState } from "@/lib/daoc/storage";
 import { Sword, Shield, Sparkles } from "lucide-react";
+import { FeatureRequestsBoard } from "@/components/feature-requests/FeatureRequestsBoard";
+import { Toaster } from "@/components/ui/sonner";
+import realmsBg from "@/assets/realms-bg.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -41,7 +44,14 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen px-4 py-12 md:py-20">
+    <div className="min-h-screen px-4 py-12 md:py-20 relative">
+      <div
+        className="realm-bg"
+        style={{ backgroundImage: `url(${realmsBg})` }}
+        aria-hidden
+      />
+      <div className="realm-bg-overlay" aria-hidden />
+      <Toaster richColors position="bottom-right" />
       <div className="max-w-5xl mx-auto">
         <header className="text-center mb-12">
           <h1 className="font-display text-4xl md:text-6xl text-primary mb-3">
@@ -118,6 +128,20 @@ function HomePage() {
         <footer className="mt-10 text-center text-xs text-muted-foreground">
           Item data exported from <span className="text-foreground/70">eden-daoc.net</span> · 16,483 items indexed
         </footer>
+
+        <section className="mt-16">
+          <header className="text-center mb-6">
+            <h2 className="font-display text-2xl md:text-3xl text-primary mb-2">
+              Feature Requests
+            </h2>
+            <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+              Submit ideas, vote on what matters most, and watch them get shipped.
+            </p>
+          </header>
+          <Card className="p-5 md:p-6 bg-card/80 backdrop-blur border-border">
+            <FeatureRequestsBoard />
+          </Card>
+        </section>
       </div>
     </div>
   );
