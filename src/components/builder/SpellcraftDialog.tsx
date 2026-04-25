@@ -138,7 +138,10 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
                 )}>
                   {g ? (
                     <>
-                      <span className="truncate">{g.label}</span>
+                      <span className="truncate" title={g.gemName}>
+                        <span className="text-muted-foreground">{g.quality}</span>{" "}
+                        {g.label}
+                      </span>
                       <span className="flex items-center gap-1.5">
                         <Badge variant="outline" className="text-[9px] py-0">{g.cost}p</Badge>
                         <button onClick={() => removeGem(i)} className="text-muted-foreground hover:text-destructive">
