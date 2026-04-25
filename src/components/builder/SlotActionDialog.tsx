@@ -24,21 +24,21 @@ export function SlotActionDialog({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="font-display">{slotLabel}</DialogTitle>
-          <DialogDescription>Välj hur du vill fylla slotten.</DialogDescription>
+          <DialogDescription>Choose how to fill this slot.</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-2 pt-2">
           <Button type="button" variant="outline" className="h-12 justify-start gap-3" onClick={onChooseItem}>
             <Database className="h-4 w-4" />
-            Välj item
+            Pick from database
           </Button>
           <Button type="button" variant="outline" className="h-12 justify-start gap-3" onClick={onChooseSpellcraft}>
             <Gem className="h-4 w-4" />
-            Spellcrafta item
+            Spellcraft a crafted item
           </Button>
           <Button type="button" variant="outline" className="h-12 justify-start gap-3" onClick={onChooseCustom}>
             <PencilLine className="h-4 w-4" />
-            Lägg till eget item
+            Add custom item
           </Button>
         </div>
       </DialogContent>

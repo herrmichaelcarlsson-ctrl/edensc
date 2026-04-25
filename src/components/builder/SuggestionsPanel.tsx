@@ -14,7 +14,7 @@ export function SuggestionsPanel({ result, totalGemSlots, totalGemUsed }: Props)
   if (result.entries.length === 0) {
     return (
       <div className="text-xs text-status-capped flex items-center gap-1.5">
-        <Sparkles className="h-3.5 w-3.5" /> Alla stats & resists är cappade!
+        <Sparkles className="h-3.5 w-3.5" /> All stats &amp; resists are capped!
       </div>
     );
   }
@@ -23,7 +23,7 @@ export function SuggestionsPanel({ result, totalGemSlots, totalGemUsed }: Props)
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <h3 className="text-[10px] uppercase tracking-widest text-muted-foreground font-display">
-          Saknas — gem-förslag
+          Missing — gem suggestions
         </h3>
         <span className="text-[10px] tabular-nums text-muted-foreground">
           {result.gemsNeeded} gems · {totalGemUsed}/{totalGemSlots} slots
@@ -33,7 +33,7 @@ export function SuggestionsPanel({ result, totalGemSlots, totalGemUsed }: Props)
       {overflow && (
         <div className="flex items-start gap-1.5 text-[11px] text-status-waste rounded border border-status-waste/30 bg-status-waste/5 p-2">
           <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-          <span>Du saknar fler stats än vad lediga gem-slots kan lösa ({result.gemsNeeded} behövs, {remaining} kvar). Lägg till fler craftbara items.</span>
+          <span>You need more gems than free gem slots can hold ({result.gemsNeeded} needed, {remaining} left). Add more craftable items.</span>
         </div>
       )}
 
