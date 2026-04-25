@@ -224,6 +224,7 @@ export function isCraftable(item: DBItem | undefined): boolean {
   if (!item) return false;
   const o = (item.origin ?? "").toUpperCase();
   const s = (item.source_type ?? "").toUpperCase();
+  if (o === "CUSTOM" || s === "CUSTOM") return false;
   if (o.includes("DROP") || o.includes("ARTIFACT") || o.includes("ML") || o.includes("TOA")) return false;
   if (s.includes("DROP") || s.includes("ARTIFACT")) return false;
   return true;
