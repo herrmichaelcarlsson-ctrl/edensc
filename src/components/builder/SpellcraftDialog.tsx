@@ -120,7 +120,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
           {status.overcharge && (
             <div className="flex items-center gap-1.5 text-status-waste text-xs ml-auto">
               <AlertTriangle className="h-4 w-4" />
-              Overcharge — riskerar att misslyckas
+              Overcharge — risk of critical failure
             </div>
           )}
         </div>
@@ -185,7 +185,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
               </label>
               <Select value={effectId} onValueChange={changeEffect}>
                 <SelectTrigger className="h-9 text-xs">
-                  <SelectValue placeholder="Välj…" />
+                  <SelectValue placeholder="Select…" />
                 </SelectTrigger>
                 <SelectContent>
                   {effectsForCategory.map((e) => (
@@ -198,24 +198,23 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Värde</label>
+              <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Gem</label>
               <Select value={gemId} onValueChange={setGemId} disabled={!effectId}>
                 <SelectTrigger className="h-9 text-xs">
-                  <SelectValue placeholder={effectId ? "Välj värde…" : "Välj stat först"} />
+                  <SelectValue placeholder={effectId ? "Select quality…" : "Pick a stat first"} />
                 </SelectTrigger>
                 <SelectContent>
                   {tiersForEffect.map((g) => {
                     const over = status.imbueUsed + g.cost > SAFE_IMBUE_LIMIT;
                     return (
                       <SelectItem key={g.id} value={g.id} className="text-xs">
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium">{g.quality}</span>
                           <span>+{g.value}{category === "resist" || category === "power" ? "%" : ""}</span>
                           <span className="text-muted-foreground">·</span>
                           <span className={cn("text-muted-foreground", over && "text-status-waste")}>
-                            {g.cost} imbue
+                            {g.cost}p imbue
                           </span>
-                          <span className="text-muted-foreground">·</span>
-                          <span className="text-muted-foreground">T{g.tier}</span>
                         </span>
                       </SelectItem>
                     );
@@ -231,15 +230,16 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
               className="h-9"
             >
               <Plus className="h-3.5 w-3.5 mr-1" />
-              Lägg till
+              Add
             </Button>
           </div>
 
           {selectedGem && (
-            <div className="flex items-center gap-2 text-[11px] pt-1">
-              <Badge variant="outline" className="text-[10px]">{selectedGem.label}</Badge>
+            <div className="flex items-center gap-2 text-[11px] pt-1 flex-wrap">
+              <Badge variant="outline" className="text-[10px]">{selectedGem.gemName}</Badge>
+              <span className="text-muted-foreground">→ {selectedGem.label}</span>
               <span className={cn("text-muted-foreground", wouldOver && "text-status-waste")}>
-                Cost {selectedGem.cost}p → totalt {status.imbueUsed + selectedGem.cost}/{SAFE_IMBUE_LIMIT}
+                · {selectedGem.cost}p imbue · total {status.imbueUsed + selectedGem.cost}/{SAFE_IMBUE_LIMIT}
                 {wouldOver && " — overcharge"}
               </span>
             </div>
@@ -247,7 +247,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
           {noSlot && (
             <div className="text-[11px] text-status-waste flex items-center gap-1.5">
               <AlertTriangle className="h-3.5 w-3.5" />
-              Alla 4 gem-slots är fulla
+              All 4 gem slots are full
             </div>
           )}
         </div>
