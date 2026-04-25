@@ -70,14 +70,6 @@ const RESIST_TABLE = [
   { tier: 7, cost: 18, value: 11 },
 ];
 
-const CAP_TABLE = [
-  { tier: 1, cost: 1, value: 1 },
-  { tier: 2, cost: 2, value: 2 },
-  { tier: 3, cost: 3, value: 3 },
-  { tier: 4, cost: 5, value: 4 },
-  { tier: 5, cost: 7, value: 5 },
-];
-
 /**
  * Canonical "Essence Jewel" family per stat (per Mythic spellcraft guide).
  */
