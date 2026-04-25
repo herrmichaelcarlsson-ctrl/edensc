@@ -3,16 +3,16 @@ import type { Realm } from "./types";
 export const CLASSES: Record<Realm, string[]> = {
   Albion: [
     "Armsman", "Cabalist", "Cleric", "Friar", "Heretic", "Infiltrator",
-    "Mauler", "Mercenary", "Minstrel", "Necromancer", "Paladin", "Reaver",
+    "Mercenary", "Minstrel", "Necromancer", "Occultist", "Paladin", "Reaver",
     "Scout", "Sorcerer", "Theurgist", "Wizard",
   ],
   Hibernia: [
     "Animist", "Bainshee", "Bard", "Blademaster", "Champion", "Druid",
-    "Eldritch", "Enchanter", "Hero", "Mauler", "Mentalist", "Nightshade",
+    "Eldritch", "Enchanter", "Hero", "Mentalist", "Nightshade",
     "Ranger", "Valewalker", "Vampiir", "Warden",
   ],
   Midgard: [
-    "Berserker", "Bonedancer", "Healer", "Hunter", "Mauler", "Runemaster",
+    "Berserker", "Bonedancer", "Healer", "Hunter", "Runemaster",
     "Savage", "Shadowblade", "Shaman", "Skald", "Spiritmaster", "Thane",
     "Valkyrie", "Warlock", "Warrior",
   ],
@@ -42,13 +42,13 @@ export const CLASS_ARMOR: Record<string, string[]> = {
   Minstrel: ["STUDDED", "LEATHER", "CLOTH"],
   Scout: ["STUDDED", "LEATHER", "CLOTH"],
   Infiltrator: ["LEATHER", "CLOTH"],
-  Mauler: ["LEATHER", "CLOTH"],
   Heretic: ["LEATHER", "CLOTH", "CHAIN"],
   Wizard: ["CLOTH"],
   Sorcerer: ["CLOTH"],
   Theurgist: ["CLOTH"],
   Cabalist: ["CLOTH"],
   Necromancer: ["CLOTH"],
+  Occultist: ["CLOTH"],
 
   // Hibernia
   Hero: ["SCALE", "REINFORCED", "LEATHER", "CLOTH"],
