@@ -4,6 +4,8 @@ import { CAPS } from "./caps";
 import type { AggregateResult } from "./aggregate";
 import { GEM_BY_ID, isCraftable, inspectGems, type GemDef, type SpellcraftMap } from "./spellcraft";
 
+const fmtPts = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
+
 /* ---------- Slot order matching Zenkcraft layout ---------- */
 const EXPORT_SLOT_ORDER: SlotKey[] = [
   "HELMETS", "GLOVES", "CHEST", "ARMS", "SHOES", "LEGS",
@@ -208,7 +210,7 @@ export function exportTemplateText(
       L.push(`Source Type: ${srcType}`);
       if (isSC) {
         const status = inspectGems(gemIds);
-        L.push(`Imbue Points: ${status.imbueUsed} of 32`);
+        L.push(`Imbue Points: ${fmtPts(status.imbueUsed)} of 32`);
       }
 
       const list = bonusesFor(item, gemIds);
@@ -227,7 +229,7 @@ export function exportTemplateText(
       L.push("Level: 51 (99% Quality)");
       L.push("Source Type: Spellcraft");
       const status = inspectGems(gemIds);
-      L.push(`Imbue Points: ${status.imbueUsed} of 32`);
+      L.push(`Imbue Points: ${fmtPts(status.imbueUsed)} of 32`);
       gemIds!.forEach((gid, i) => {
         const gem = GEM_BY_ID[gid];
         if (!gem) return;
@@ -272,7 +274,7 @@ export function exportTemplateText(
       L.push("");
       L.push(`[${slotLabel}] ${item?.name ?? "(crafted shell)"}`);
       const status = inspectGems(ids);
-      L.push(`  Imbue: ${status.imbueUsed}/32 ${status.overcharge ? "(OVERCHARGE)" : ""}`);
+      L.push(`  Imbue: ${fmtPts(status.imbueUsed)}/32 ${status.overcharge ? "(OVERCHARGE)" : ""}`);
       ids.forEach((id, i) => {
         const gem = GEM_BY_ID[id];
         if (!gem) return;
@@ -287,7 +289,7 @@ export function exportTemplateText(
     );
     const nameWidth = Math.max(...sorted.map((e) => e.gem.gemName.length));
     for (const { gem, count } of sorted) {
-      L.push(`  ${String(count).padStart(2)}x  ${gem.gemName.padEnd(nameWidth)}  (${gem.cost} imbue)`);
+      L.push(`  ${String(count).padStart(2)}x  ${gem.gemName.padEnd(nameWidth)}  (${fmtPts(gem.cost)} imbue)`);
     }
   }
 
