@@ -28,7 +28,6 @@ interface Props {
 const CATEGORIES: { key: GemCategory; label: string }[] = [
   { key: "stat", label: "Stats" },
   { key: "resist", label: "Resists" },
-  { key: "cap", label: "Stat Caps" },
   { key: "hp", label: "Hit Points" },
   { key: "power", label: "Power" },
 ];
@@ -163,7 +162,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Add gem</div>
 
           {/* Category */}
-          <div className="grid grid-cols-5 gap-1">
+          <div className="grid grid-cols-4 gap-1">
             {CATEGORIES.map((c) => (
               <button
                 key={c.key}
