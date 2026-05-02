@@ -9,11 +9,30 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminFormulasRouteImport } from './routes/admin.formulas'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedbackRoute = FeedbackRouteImport.update({
   id: '/feedback',
   path: '/feedback',
@@ -29,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminFormulasRoute = AdminFormulasRouteImport.update({
+  id: '/admin/formulas',
+  path: '/admin/formulas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
   id: '/admin/feedback',
   path: '/admin/feedback',
@@ -39,38 +63,100 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/feedback': typeof FeedbackRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/formulas': typeof AdminFormulasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/feedback': typeof FeedbackRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/formulas': typeof AdminFormulasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
   '/feedback': typeof FeedbackRoute
+  '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
+  '/admin/formulas': typeof AdminFormulasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/builder' | '/feedback' | '/admin/feedback'
+  fullPaths:
+    | '/'
+    | '/builder'
+    | '/feedback'
+    | '/login'
+    | '/reset-password'
+    | '/templates'
+    | '/admin/feedback'
+    | '/admin/formulas'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/builder' | '/feedback' | '/admin/feedback'
-  id: '__root__' | '/' | '/builder' | '/feedback' | '/admin/feedback'
+  to:
+    | '/'
+    | '/builder'
+    | '/feedback'
+    | '/login'
+    | '/reset-password'
+    | '/templates'
+    | '/admin/feedback'
+    | '/admin/formulas'
+  id:
+    | '__root__'
+    | '/'
+    | '/builder'
+    | '/feedback'
+    | '/login'
+    | '/reset-password'
+    | '/templates'
+    | '/admin/feedback'
+    | '/admin/formulas'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BuilderRoute: typeof BuilderRoute
   FeedbackRoute: typeof FeedbackRoute
+  LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  TemplatesRoute: typeof TemplatesRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
+  AdminFormulasRoute: typeof AdminFormulasRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feedback': {
       id: '/feedback'
       path: '/feedback'
@@ -92,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/formulas': {
+      id: '/admin/formulas'
+      path: '/admin/formulas'
+      fullPath: '/admin/formulas'
+      preLoaderRoute: typeof AdminFormulasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/feedback': {
       id: '/admin/feedback'
       path: '/admin/feedback'
@@ -106,7 +199,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BuilderRoute: BuilderRoute,
   FeedbackRoute: FeedbackRoute,
+  LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  TemplatesRoute: TemplatesRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
+  AdminFormulasRoute: AdminFormulasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
