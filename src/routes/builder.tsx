@@ -20,7 +20,7 @@ import { suggestGems } from "@/lib/daoc/suggest";
 import { loadState, saveState } from "@/lib/daoc/storage";
 import { exportTemplateText } from "@/lib/daoc/export";
 import { importZenkcraftText } from "@/lib/daoc/import";
-import { ArrowLeft, Copy, Save, Trash2, Download, Upload } from "lucide-react";
+import { ArrowLeft, FileText, Save, Trash2, Download, Upload, Globe2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import type { ItemEffect } from "@/lib/daoc/types";
@@ -231,7 +231,24 @@ function BuilderPage() {
     a.download = `${templateName.replace(/[^a-z0-9]+/gi, "_")}_Summary.txt`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("Template copied & downloaded");
+    toast.success("TXT exported (also copied to clipboard)");
+  }
+
+  async function publishToLibrary() {
+    if (!realm) return;
+    const code = (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)).slice(0, 8);
+    const { error } = await supabase.from("saved_templates").insert({
+      name: templateName,
+      realm,
+      class_name: className,
+      slots: slots as never,
+      spellcraft: spellcraft as never,
+      is_public: true,
+      share_code: code,
+      gear_score: agg.score,
+    });
+    if (error) toast.error("Publish failed: " + error.message);
+    else toast.success("Published to community library");
   }
 
   function exportJson() {
@@ -309,7 +326,7 @@ function BuilderPage() {
           {className && <Badge variant="secondary">{className}</Badge>}
           <div className="flex-1" />
           <Button size="sm" variant="ghost" onClick={exportText}>
-            <Copy className="h-4 w-4 mr-1.5" /> Copy
+            <FileText className="h-4 w-4 mr-1.5" /> Export TXT
           </Button>
           <Button size="sm" variant="ghost" onClick={exportJson}>
             <Download className="h-4 w-4 mr-1.5" /> JSON
@@ -320,6 +337,9 @@ function BuilderPage() {
           </label>
           <Button size="sm" variant="ghost" onClick={clearAll}>
             <Trash2 className="h-4 w-4 mr-1.5" /> Clear
+          </Button>
+          <Button size="sm" variant="outline" onClick={publishToLibrary}>
+            <Globe2 className="h-4 w-4 mr-1.5" /> Publish
           </Button>
           <Button size="sm" onClick={saveToCloud}>
             <Save className="h-4 w-4 mr-1.5" /> Save
