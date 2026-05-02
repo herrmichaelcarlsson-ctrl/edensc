@@ -29,16 +29,19 @@ const EFFECT_OPTIONS: { id: string; label: string; group: string; suffix?: strin
   { id: "EMPATHY", label: "Empathy", group: "Stats" },
   { id: "CHARISMA", label: "Charisma", group: "Stats" },
   { id: "INTELLIGENCE", label: "Intelligence", group: "Stats" },
-  // Stat caps
-  { id: "CAP_STRENGTH", label: "Strength Cap", group: "Stat caps" },
-  { id: "CAP_CONSTITUTION", label: "Constitution Cap", group: "Stat caps" },
-  { id: "CAP_DEXTERITY", label: "Dexterity Cap", group: "Stat caps" },
-  { id: "CAP_QUICKNESS", label: "Quickness Cap", group: "Stat caps" },
-  { id: "CAP_ACUITY", label: "Acuity Cap", group: "Stat caps" },
+  // Stat caps (ToA / drops only — not craftable)
+  { id: "CAP_STRENGTH", label: "Strength Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_CONSTITUTION", label: "Constitution Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_DEXTERITY", label: "Dexterity Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_QUICKNESS", label: "Quickness Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_ACUITY", label: "Acuity Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_PIETY", label: "Piety Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_EMPATHY", label: "Empathy Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_CHARISMA", label: "Charisma Cap", group: "Stat Caps (ToA)" },
+  { id: "CAP_HITPOINTS", label: "HP Cap", group: "Stat Caps (ToA)" },
   // Vital
   { id: "HITPOINTS", label: "Hit Points", group: "Vital" },
   { id: "POWER_POOL", label: "Power %", group: "Vital", suffix: "%" },
-  { id: "CAP_HITPOINTS", label: "HP Cap", group: "Vital" },
   // Resists
   { id: "RES_CRUSH", label: "Crush Resist", group: "Resists", suffix: "%" },
   { id: "RES_SLASH", label: "Slash Resist", group: "Resists", suffix: "%" },
@@ -49,6 +52,21 @@ const EFFECT_OPTIONS: { id: string; label: string; group: string; suffix?: strin
   { id: "RES_BODY", label: "Body Resist", group: "Resists", suffix: "%" },
   { id: "RES_SPIRIT", label: "Spirit Resist", group: "Resists", suffix: "%" },
   { id: "RES_ENERGY", label: "Energy Resist", group: "Resists", suffix: "%" },
+  // ToA bonuses
+  { id: "MELEE_DAMAGE",  label: "Melee Damage",   group: "ToA Bonuses", suffix: "%" },
+  { id: "MAGIC_DAMAGE",  label: "Magic Damage",   group: "ToA Bonuses", suffix: "%" },
+  { id: "STYLE_DAMAGE",  label: "Style Damage",   group: "ToA Bonuses", suffix: "%" },
+  { id: "ARCHERY_DMG",   label: "Archery Damage", group: "ToA Bonuses", suffix: "%" },
+  { id: "MELEE_SPEED",   label: "Melee Speed",    group: "ToA Bonuses", suffix: "%" },
+  { id: "ARCHERY_SPEED", label: "Archery Speed",  group: "ToA Bonuses", suffix: "%" },
+  { id: "CAST_SPEED",    label: "Casting Speed",  group: "ToA Bonuses", suffix: "%" },
+  { id: "SPELL_RANGE",   label: "Spell Range",    group: "ToA Bonuses", suffix: "%" },
+  { id: "SPELL_DURATION",label: "Spell Duration", group: "ToA Bonuses", suffix: "%" },
+  { id: "BUFF_BONUS",    label: "Buff Effectiveness", group: "ToA Bonuses", suffix: "%" },
+  { id: "DEBUFF_BONUS",  label: "Debuff Effectiveness", group: "ToA Bonuses", suffix: "%" },
+  { id: "HEAL_BONUS",    label: "Healing Effect", group: "ToA Bonuses", suffix: "%" },
+  { id: "FATIGUE",       label: "Fatigue",        group: "ToA Bonuses" },
+  { id: "POWER_POOL_FLAT", label: "Power Pool",   group: "ToA Bonuses" },
 ];
 
 const MAX_EFFECTS = 10;
