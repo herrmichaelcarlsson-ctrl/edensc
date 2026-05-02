@@ -110,14 +110,11 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
                       <span>Bonus lvl {it.bonus_level ?? "?"}</span>
                     </div>
                     <div className="mt-1 flex flex-wrap gap-1">
-                      {(it.effects ?? []).slice(0, 6).map((e, i) => (
+                      {(it.effects ?? []).map((e, i) => (
                         <span key={i} className="text-[10px] rounded px-1.5 py-0.5 bg-muted text-muted-foreground">
                           +{e.value} {e.id.replace(/_/g, " ")}
                         </span>
                       ))}
-                      {(it.effects?.length ?? 0) > 6 && (
-                        <span className="text-[10px] text-muted-foreground">+{it.effects!.length - 6} more</span>
-                      )}
                     </div>
                   </div>
                   <Button size="sm" variant="default" className="shrink-0">Pick</Button>
