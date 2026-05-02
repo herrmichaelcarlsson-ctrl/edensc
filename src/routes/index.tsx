@@ -1,14 +1,17 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CLASSES } from "@/lib/daoc/classes";
 import type { Realm } from "@/lib/daoc/types";
 import { saveState, loadState } from "@/lib/daoc/storage";
-import { Sword, Shield, Sparkles } from "lucide-react";
+import { Sword, Shield, Sparkles, LogIn, LogOut, LibraryBig, Plus } from "lucide-react";
 import { FeatureRequestsBoard } from "@/components/feature-requests/FeatureRequestsBoard";
 import { Toaster } from "@/components/ui/sonner";
 import realmsBg from "@/assets/realms-bg.png";
+import { racesForRealm } from "@/lib/daoc/races";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,8 +31,21 @@ const REALM_INFO: { realm: Realm; tagline: string; color: string; icon: typeof S
 
 function HomePage() {
   const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
   const [realm, setRealm] = useState<Realm | null>(null);
   const [className, setClassName] = useState<string | null>(null);
+  const [race, setRace] = useState<string | null>(null);
+  const [templateCount, setTemplateCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const { count } = await supabase
+        .from("saved_templates")
+        .select("id", { count: "exact", head: true })
+        .eq("is_public", true);
+      setTemplateCount(count ?? 0);
+    })();
+  }, []);
 
   function handleStart() {
     if (!realm) return;
@@ -43,6 +59,8 @@ function HomePage() {
     navigate({ to: "/builder" });
   }
 
+  const races = racesForRealm(realm);
+
   return (
     <div className="min-h-screen px-4 py-12 md:py-20 relative">
       <div
@@ -52,6 +70,27 @@ function HomePage() {
       />
       <div className="realm-bg-overlay" aria-hidden />
       <Toaster richColors position="bottom-right" />
+      <nav className="absolute top-4 right-4 z-10 flex items-center gap-2 text-xs">
+        <Link to="/templates" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
+          <LibraryBig className="h-3.5 w-3.5" /> Library
+          {templateCount != null && <span className="text-muted-foreground ml-1">({templateCount})</span>}
+        </Link>
+        <Link to="/items/submit" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
+          <Plus className="h-3.5 w-3.5" /> Submit item
+        </Link>
+        {user ? (
+          <>
+            <span className="text-muted-foreground hidden sm:inline">Hi, {profile?.display_name ?? "player"}</span>
+            <button onClick={() => signOut()} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
+              <LogOut className="h-3.5 w-3.5" /> Sign out
+            </button>
+          </>
+        ) : (
+          <Link to="/login" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
+            <LogIn className="h-3.5 w-3.5" /> Sign in
+          </Link>
+        )}
+      </nav>
       <div className="max-w-5xl mx-auto">
         <header className="text-center mb-12">
           <h1 className="font-display text-4xl md:text-6xl text-primary mb-3">
@@ -61,6 +100,11 @@ function HomePage() {
             Craft, calculate and optimize Dark Age of Camelot character templates.
             Live cap tracking, spellcraft assistance, full Eden item database.
           </p>
+          {templateCount != null && (
+            <p className="text-xs text-muted-foreground/80 mt-3">
+              <span className="text-primary font-semibold tabular-nums">{templateCount}</span> community templates published
+            </p>
+          )}
         </header>
 
         <Card className="p-6 md:p-8 bg-card/80 backdrop-blur border-border">
@@ -73,7 +117,7 @@ function HomePage() {
               return (
                 <button
                   key={r.realm}
-                  onClick={() => { setRealm(r.realm); setClassName(null); }}
+                  onClick={() => { setRealm(r.realm); setClassName(null); setRace(null); }}
                   className={`group relative overflow-hidden rounded-lg border p-5 text-left transition-all ${
                     active
                       ? "border-primary ring-2 ring-primary/40 bg-card"
@@ -91,7 +135,31 @@ function HomePage() {
             })}
           </div>
 
-          <h2 className="font-display text-xl mb-1">2. Choose your class <span className="text-sm text-muted-foreground font-body">(optional)</span></h2>
+          <h2 className="font-display text-xl mb-1">2. Choose your race <span className="text-sm text-muted-foreground font-body">(optional)</span></h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            Race base stats and innate resists are factored into your template.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-8 min-h-[40px]">
+            {realm ? (
+              races.map((r) => (
+                <button
+                  key={r.name}
+                  onClick={() => setRace(r.name === race ? null : r.name)}
+                  className={`px-3 py-1.5 rounded text-xs border transition-colors ${
+                    race === r.name
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border hover:border-primary/50 text-foreground/80"
+                  }`}
+                >
+                  {r.name}
+                </button>
+              ))
+            ) : (
+              <span className="text-sm text-muted-foreground">Pick a realm first.</span>
+            )}
+          </div>
+
+          <h2 className="font-display text-xl mb-1">3. Choose your class <span className="text-sm text-muted-foreground font-body">(optional)</span></h2>
           <p className="text-sm text-muted-foreground mb-4">
             Filters items with class restrictions. Skip to see everything.
           </p>
