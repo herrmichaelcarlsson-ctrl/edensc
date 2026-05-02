@@ -25,6 +25,8 @@ interface Props {
   onChange: (gems: GemSet) => void;
 }
 
+const fmtPts = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
+
 const CATEGORIES: { key: GemCategory; label: string }[] = [
   { key: "stat", label: "Stats" },
   { key: "resist", label: "Resists" },
@@ -113,7 +115,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
               "font-display text-lg tabular-nums",
               status.overcharge ? "text-status-waste" : status.imbueUsed === SAFE_IMBUE_LIMIT ? "text-status-capped" : "text-foreground",
             )}>
-              {status.imbueUsed} / {SAFE_IMBUE_LIMIT}
+              {fmtPts(status.imbueUsed)} / {SAFE_IMBUE_LIMIT}
             </span>
           </div>
           {status.overcharge && (
@@ -142,7 +144,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
                         {g.label}
                       </span>
                       <span className="flex items-center gap-1.5">
-                        <Badge variant="outline" className="text-[9px] py-0">{g.cost}p</Badge>
+                        <Badge variant="outline" className="text-[9px] py-0">{fmtPts(g.cost)}p</Badge>
                         <button onClick={() => removeGem(i)} className="text-muted-foreground hover:text-destructive">
                           <X className="h-3 w-3" />
                         </button>
@@ -215,7 +217,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
                           <span>+{g.value}{category === "resist" || category === "power" ? "%" : ""}</span>
                           <span className="text-muted-foreground">·</span>
                           <span className={cn("text-muted-foreground", over && "text-status-waste")}>
-                            {g.cost}p imbue
+                            {fmtPts(g.cost)}p imbue
                           </span>
                         </span>
                       </SelectItem>
@@ -241,7 +243,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
               <Badge variant="outline" className="text-[10px]">{selectedGem.gemName}</Badge>
               <span className="text-muted-foreground">→ {selectedGem.label}</span>
               <span className={cn("text-muted-foreground", wouldOver && "text-status-waste")}>
-                · {selectedGem.cost}p imbue · total {status.imbueUsed + selectedGem.cost}/{SAFE_IMBUE_LIMIT}
+                · {fmtPts(selectedGem.cost)}p imbue · total {fmtPts(status.imbueUsed + selectedGem.cost)}/{SAFE_IMBUE_LIMIT}
                 {wouldOver && " — overcharge"}
               </span>
             </div>
