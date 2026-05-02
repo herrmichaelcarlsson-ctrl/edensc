@@ -1,25 +1,30 @@
 /**
- * DAoC Spellcraft engine.
+ * DAoC / Eden Spellcraft engine — canonical 1.124 era values.
+ *
+ * Sourced from the Eden imbue point reference table (Raw → Perfect, 10 tiers).
  *
  * Rules:
  *  - Each spellcraftable item supports max 4 gems.
- *  - Each gem grants ONE bonus (stat / resist / skill / cap / hp / power).
- *  - Each gem costs "imbue points" depending on its tier.
- *  - Default safe imbue limit = 32 (Eden MP gear).
- *  - Drops / artifacts are NOT craftable.
+ *  - Each gem grants ONE bonus (stat / resist / hp / power / skill).
+ *  - Each gem costs imbue points; safe limit on MP gear = 32.
+ *  - Stat caps are NOT spellcraftable (only on items themselves).
+ *  - Drops / artifacts / ToA / ML items are NOT craftable.
  */
 
 import type { DBItem } from "./types";
 
-export type GemCategory = "stat" | "resist" | "skill" | "cap" | "hp" | "power";
+export type GemCategory = "stat" | "resist" | "hp" | "power" | "skill";
 
 export interface GemDef {
   id: string;
+  /** Short label, e.g. "+25 Strength" */
   label: string;
   effectId: string;
   value: number;
+  /** Imbue point cost (can be 0.5 / 1.5 / etc.) */
   cost: number;
   category: GemCategory;
+  /** 1..10 */
   tier: number;
   /** Canonical gem name, e.g. "Flawless Fiery Essence Jewel" */
   gemName: string;
@@ -27,96 +32,87 @@ export interface GemDef {
   quality: string;
   /** Family name, e.g. "Fiery Essence Jewel" */
   family: string;
+  /** Rough vendor / craft price reference (copper) */
+  price: number;
 }
 
-/**
- * Canonical Mythic gem qualities (1.87 era — used by Eden).
- */
+/** Canonical Eden / Mythic 10-tier quality progression. */
 const QUALITIES = [
-  "Flawed",      // T1
-  "Imperfect",   // T2
-  "Polished",    // T3
-  "Faceted",     // T4
-  "Precious",    // T5
-  "Flawless",    // T6
-  "Perfect",     // T7
+  "Raw",        // T1
+  "Uncut",      // T2
+  "Rough",      // T3
+  "Flawed",     // T4
+  "Imperfect",  // T5
+  "Polished",   // T6
+  "Faceted",    // T7
+  "Precious",   // T8
+  "Flawless",   // T9
+  "Perfect",    // T10
 ] as const;
 
-/**
- * Stats: Essence jewels.
- * Value: +3/+5/+7/+9/+11/+13/+15 — cost: 1/2/4/6/9/13/18
- */
+/* ============================================================
+   Per-tier value/cost tables (verified against Eden reference)
+   ============================================================ */
+
+/** Stats: +1/4/7/10/13/16/19/22/25/28 — imbue 0.5/1.5/2.5/.../9.5 */
 const STAT_TABLE = [
-  { tier: 1, cost: 1,  value: 3  },
-  { tier: 2, cost: 2,  value: 5  },
-  { tier: 3, cost: 4,  value: 7  },
-  { tier: 4, cost: 6,  value: 9  },
-  { tier: 5, cost: 9,  value: 11 },
-  { tier: 6, cost: 13, value: 13 },
-  { tier: 7, cost: 18, value: 15 },
+  { tier: 1,  value: 1,  cost: 0.5, price:    160 },
+  { tier: 2,  value: 4,  cost: 1.5, price:    920 },
+  { tier: 3,  value: 7,  cost: 2.5, price:   3900 },
+  { tier: 4,  value: 10, cost: 3.5, price:  13900 },
+  { tier: 5,  value: 13, cost: 4.5, price:  40100 },
+  { tier: 6,  value: 16, cost: 5.5, price:  88980 },
+  { tier: 7,  value: 19, cost: 6.5, price: 193000 },
+  { tier: 8,  value: 22, cost: 7.5, price: 198920 },
+  { tier: 9,  value: 25, cost: 8.5, price: 258240 },
+  { tier: 10, value: 28, cost: 9.5, price: 296860 },
 ];
 
-/**
- * Resists: Shielding jewels.
- * Value: +1/+2/+3/+5/+7/+9/+11% — cost: 1/2/4/6/9/13/18
- */
+/** Resists: +1/2/3/5/7/9/11/13/15/17 % — imbue 0.5/1/2/4/6/8/10/12/14/16 */
 const RESIST_TABLE = [
-  { tier: 1, cost: 1,  value: 1  },
-  { tier: 2, cost: 2,  value: 2  },
-  { tier: 3, cost: 4,  value: 3  },
-  { tier: 4, cost: 6,  value: 5  },
-  { tier: 5, cost: 9,  value: 7  },
-  { tier: 6, cost: 13, value: 9  },
-  { tier: 7, cost: 18, value: 11 },
+  { tier: 1,  value: 1,  cost: 0.5, price:    160 },
+  { tier: 2,  value: 2,  cost: 1,   price:    980 },
+  { tier: 3,  value: 3,  cost: 2,   price:   4020 },
+  { tier: 4,  value: 5,  cost: 4,   price:  14080 },
+  { tier: 5,  value: 7,  cost: 6,   price:  40340 },
+  { tier: 6,  value: 9,  cost: 8,   price:  89280 },
+  { tier: 7,  value: 11, cost: 10,  price: 133360 },
+  { tier: 8,  value: 13, cost: 12,  price: 199340 },
+  { tier: 9,  value: 15, cost: 14,  price: 258720 },
+  { tier: 10, value: 17, cost: 16,  price: 297400 },
 ];
 
-/**
- * Hit Points: Blood Essence Jewel.
- * Value: +12/+24/+36/+48/+60/+72/+84 HP — cost: 1/2/4/6/9/13/18
- */
+/** Hit points (Blood Essence Jewel): +4/12/20/.../76 — imbue same as stats. */
 const HP_TABLE = [
-  { tier: 1, cost: 1,  value: 12 },
-  { tier: 2, cost: 2,  value: 24 },
-  { tier: 3, cost: 4,  value: 36 },
-  { tier: 4, cost: 6,  value: 48 },
-  { tier: 5, cost: 9,  value: 60 },
-  { tier: 6, cost: 13, value: 72 },
-  { tier: 7, cost: 18, value: 84 },
+  { tier: 1,  value: 4,  cost: 0.5, price:    160 },
+  { tier: 2,  value: 12, cost: 1.5, price:    920 },
+  { tier: 3,  value: 20, cost: 2.5, price:   3900 },
+  { tier: 4,  value: 28, cost: 3.5, price:  13900 },
+  { tier: 5,  value: 36, cost: 4.5, price:  40100 },
+  { tier: 6,  value: 44, cost: 5.5, price:  88980 },
+  { tier: 7,  value: 52, cost: 6.5, price: 133000 },
+  { tier: 8,  value: 60, cost: 7.5, price: 198920 },
+  { tier: 9,  value: 68, cost: 8.5, price: 258240 },
+  { tier: 10, value: 76, cost: 9.5, price: 296860 },
 ];
 
-/**
- * Power pool: Mystical Essence Jewel.
- * Value: +1/+2/+3/+4/+5/+6% — cost: 1/2/4/6/9/13
- */
+/** Power (Mystic Essence Jewel): +1/2/3/5/7/9/11/13/15/17 — imbue 0.5/1/2/4/6/8/10/12/14/16 */
 const POWER_TABLE = [
-  { tier: 1, cost: 1,  value: 1 },
-  { tier: 2, cost: 2,  value: 2 },
-  { tier: 3, cost: 4,  value: 3 },
-  { tier: 4, cost: 6,  value: 4 },
-  { tier: 5, cost: 9,  value: 5 },
-  { tier: 6, cost: 13, value: 6 },
+  { tier: 1,  value: 1,  cost: 0.5, price:    160 },
+  { tier: 2,  value: 2,  cost: 1,   price:    980 },
+  { tier: 3,  value: 3,  cost: 2,   price:   3900 },
+  { tier: 4,  value: 5,  cost: 4,   price:  13900 },
+  { tier: 5,  value: 7,  cost: 6,   price:  40100 },
+  { tier: 6,  value: 9,  cost: 8,   price:  88980 },
+  { tier: 7,  value: 11, cost: 10,  price: 133000 },
+  { tier: 8,  value: 13, cost: 12,  price: 198920 },
+  { tier: 9,  value: 15, cost: 14,  price: 258240 },
+  { tier: 10, value: 17, cost: 16,  price: 296860 },
 ];
 
-/**
- * Stat caps: Essence Jewel (capped stats).
- * Value: +5/+10/+15/+20/+25/+30/+35 — cost: 1/2/4/6/9/13/18
- * Note: Stat caps CAN be spellcrafted in Eden (unlike live).
- */
-const CAP_TABLE = [
-  { tier: 1, cost: 1,  value: 5  },
-  { tier: 2, cost: 2,  value: 10 },
-  { tier: 3, cost: 4,  value: 15 },
-  { tier: 4, cost: 6,  value: 20 },
-  { tier: 5, cost: 9,  value: 25 },
-  { tier: 6, cost: 13, value: 30 },
-  { tier: 7, cost: 18, value: 35 },
-];
-
-/**
- * Canonical "Essence Jewel" family per stat.
- * Note: Acuity and Intelligence are separate realm stats — both kept for
- * cross-realm template support, but a character only has one of them.
- */
+/* ============================================================
+   Stats — Essence Jewel families (canonical Eden names)
+   ============================================================ */
 const STATS = [
   { id: "STRENGTH",     label: "Strength",     family: "Fiery Essence Jewel"   },
   { id: "CONSTITUTION", label: "Constitution", family: "Earthen Essence Jewel" },
@@ -126,45 +122,29 @@ const STATS = [
   { id: "PIETY",        label: "Piety",        family: "Watery Essence Jewel"  },
   { id: "EMPATHY",      label: "Empathy",      family: "Heated Essence Jewel"  },
   { id: "CHARISMA",     label: "Charisma",     family: "Icy Essence Jewel"     },
-  // Acuity is a display alias; maps to Intelligence/Piety/Empathy/Charisma
-  // depending on class — kept as a separate gem for templates that list it.
+  // Acuity = display alias; uses Dusty/Watery/Heated/Icy depending on class.
+  // Kept as separate selector so cross-realm templates still resolve.
   { id: "ACUITY",       label: "Acuity",       family: "Dusty Essence Jewel"   },
 ];
 
-/**
- * Stat caps — same families as stats but different gem category.
- */
-const STAT_CAPS = [
-  { id: "CAP_STRENGTH",     label: "Strength Cap",     family: "Fiery Essence Jewel"   },
-  { id: "CAP_CONSTITUTION", label: "Constitution Cap", family: "Earthen Essence Jewel" },
-  { id: "CAP_DEXTERITY",    label: "Dexterity Cap",    family: "Vapor Essence Jewel"   },
-  { id: "CAP_QUICKNESS",    label: "Quickness Cap",    family: "Airy Essence Jewel"    },
-  { id: "CAP_INTELLIGENCE", label: "Intelligence Cap", family: "Dusty Essence Jewel"   },
-  { id: "CAP_PIETY",        label: "Piety Cap",        family: "Watery Essence Jewel"  },
-  { id: "CAP_EMPATHY",      label: "Empathy Cap",      family: "Heated Essence Jewel"  },
-  { id: "CAP_CHARISMA",     label: "Charisma Cap",     family: "Icy Essence Jewel"     },
-  { id: "CAP_ACUITY",       label: "Acuity Cap",       family: "Dusty Essence Jewel"   },
-];
-
-/**
- * Canonical "Shielding Jewel" family per resist.
- */
+/* ============================================================
+   Resists — Shielding Jewel families (canonical Eden names)
+   ============================================================ */
 const RESISTS = [
-  { id: "RES_CRUSH",  label: "Crush",  family: "Fiery Shielding Jewel"  },
-  { id: "RES_SLASH",  label: "Slash",  family: "Watery Shielding Jewel" },
-  { id: "RES_THRUST", label: "Thrust", family: "Airy Shielding Jewel"   },
-  { id: "RES_HEAT",   label: "Heat",   family: "Heated Shielding Jewel" },
-  { id: "RES_COLD",   label: "Cold",   family: "Icy Shielding Jewel"    },
-  { id: "RES_MATTER", label: "Matter", family: "Earthen Shielding Jewel"},
-  { id: "RES_BODY",   label: "Body",   family: "Dusty Shielding Jewel"  },
-  { id: "RES_SPIRIT", label: "Spirit", family: "Vapor Shielding Jewel"  },
-  { id: "RES_ENERGY", label: "Energy", family: "Light Shielding Jewel"  },
+  { id: "RES_CRUSH",  label: "Crush",  family: "Fiery Shielding Jewel"   },
+  { id: "RES_SLASH",  label: "Slash",  family: "Watery Shielding Jewel"  },
+  { id: "RES_THRUST", label: "Thrust", family: "Airy Shielding Jewel"    },
+  { id: "RES_HEAT",   label: "Heat",   family: "Heated Shielding Jewel"  },
+  { id: "RES_COLD",   label: "Cold",   family: "Icy Shielding Jewel"     },
+  { id: "RES_MATTER", label: "Matter", family: "Earthen Shielding Jewel" },
+  { id: "RES_BODY",   label: "Body",   family: "Dusty Shielding Jewel"   },
+  { id: "RES_SPIRIT", label: "Spirit", family: "Vapor Shielding Jewel"   },
+  { id: "RES_ENERGY", label: "Energy", family: "Light Shielding Jewel"   },
 ];
 
 function buildGems(): GemDef[] {
   const out: GemDef[] = [];
 
-  // Stats
   for (const s of STATS) {
     for (const t of STAT_TABLE) {
       const quality = QUALITIES[t.tier - 1];
@@ -179,11 +159,11 @@ function buildGems(): GemDef[] {
         family: s.family,
         quality,
         gemName: `${quality} ${s.family}`,
+        price: t.price,
       });
     }
   }
 
-  // Resists
   for (const r of RESISTS) {
     for (const t of RESIST_TABLE) {
       const quality = QUALITIES[t.tier - 1];
@@ -198,11 +178,11 @@ function buildGems(): GemDef[] {
         family: r.family,
         quality,
         gemName: `${quality} ${r.family}`,
+        price: t.price,
       });
     }
   }
 
-  // Hit Points
   for (const t of HP_TABLE) {
     const quality = QUALITIES[t.tier - 1];
     const family = "Blood Essence Jewel";
@@ -217,16 +197,16 @@ function buildGems(): GemDef[] {
       family,
       quality,
       gemName: `${quality} ${family}`,
+      price: t.price,
     });
   }
 
-  // Power pool
   for (const t of POWER_TABLE) {
     const quality = QUALITIES[t.tier - 1];
-    const family = "Mystical Essence Jewel";
+    const family = "Mystic Essence Jewel";
     out.push({
       id: `power_t${t.tier}`,
-      label: `+${t.value}% Power`,
+      label: `+${t.value} Power`,
       effectId: "POWER_POOL",
       value: t.value,
       cost: t.cost,
@@ -235,26 +215,8 @@ function buildGems(): GemDef[] {
       family,
       quality,
       gemName: `${quality} ${family}`,
+      price: t.price,
     });
-  }
-
-  // Stat caps
-  for (const s of STAT_CAPS) {
-    for (const t of CAP_TABLE) {
-      const quality = QUALITIES[t.tier - 1];
-      out.push({
-        id: `cap_${s.id.toLowerCase()}_t${t.tier}`,
-        label: `+${t.value} ${s.label}`,
-        effectId: s.id,
-        value: t.value,
-        cost: t.cost,
-        category: "cap",
-        tier: t.tier,
-        family: s.family,
-        quality,
-        gemName: `${quality} ${s.family}`,
-      });
-    }
   }
 
   return out;
