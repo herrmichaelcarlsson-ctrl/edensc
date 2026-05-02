@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ItemsSubmitRouteImport } from './routes/items.submit'
 import { Route as AdminFormulasRouteImport } from './routes/admin.formulas'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 
@@ -48,6 +49,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ItemsSubmitRoute = ItemsSubmitRouteImport.update({
+  id: '/items/submit',
+  path: '/items/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminFormulasRoute = AdminFormulasRouteImport.update({
   id: '/admin/formulas',
   path: '/admin/formulas',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/items/submit': typeof ItemsSubmitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/items/submit': typeof ItemsSubmitRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/items/submit': typeof ItemsSubmitRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/items/submit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/items/submit'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/items/submit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   TemplatesRoute: typeof TemplatesRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
   AdminFormulasRoute: typeof AdminFormulasRoute
+  ItemsSubmitRoute: typeof ItemsSubmitRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/items/submit': {
+      id: '/items/submit'
+      path: '/items/submit'
+      fullPath: '/items/submit'
+      preLoaderRoute: typeof ItemsSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/formulas': {
       id: '/admin/formulas'
       path: '/admin/formulas'
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemplatesRoute: TemplatesRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
   AdminFormulasRoute: AdminFormulasRoute,
+  ItemsSubmitRoute: ItemsSubmitRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
