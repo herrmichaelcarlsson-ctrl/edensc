@@ -14,6 +14,7 @@
 import type { DBItem } from "./types";
 
 export type GemCategory = "stat" | "resist" | "hp" | "power" | "skill";
+export type GemRealm = "Albion" | "Hibernia" | "Midgard";
 
 export interface GemDef {
   id: string;
@@ -34,6 +35,8 @@ export interface GemDef {
   family: string;
   /** Rough vendor / craft price reference (copper) */
   price: number;
+  /** For skill gems: which realm they belong to (Albion / Hibernia / Midgard). */
+  realm?: GemRealm;
 }
 
 /** Canonical Eden / Mythic 10-tier quality progression. */
