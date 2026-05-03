@@ -466,6 +466,7 @@ function BuilderPage() {
         slot={spellcraftSlot}
         item={spellcraftSlot ? itemsBySlot[spellcraftSlot] : undefined}
         gems={spellcraftSlot ? (spellcraft[spellcraftSlot] ?? []) : []}
+        realm={realm}
         onChange={(gs) => {
           if (!spellcraftSlot) return;
           setSpellcraft((sc) => ({ ...sc, [spellcraftSlot]: gs }));
