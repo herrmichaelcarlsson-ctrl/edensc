@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2 } from "lucide-react";
 import type { ItemEffect } from "@/lib/daoc/types";
+import { EFFECT_OPTIONS, EFFECT_GROUPS, effectById, type EffectGroup } from "@/lib/daoc/effect-catalog";
 
 interface Props {
   open: boolean;
@@ -14,93 +15,37 @@ interface Props {
   onSave: (name: string, effects: ItemEffect[]) => void;
 }
 
-/**
- * Stat / resist / vital effect IDs the user can pick when describing a
- * drop, artifact or any non-craftable item by hand.
- */
-const EFFECT_OPTIONS: { id: string; label: string; group: string; suffix?: string }[] = [
-  // Stats
-  { id: "STRENGTH", label: "Strength", group: "Stats" },
-  { id: "CONSTITUTION", label: "Constitution", group: "Stats" },
-  { id: "DEXTERITY", label: "Dexterity", group: "Stats" },
-  { id: "QUICKNESS", label: "Quickness", group: "Stats" },
-  { id: "ACUITY", label: "Acuity", group: "Stats" },
-  { id: "PIETY", label: "Piety", group: "Stats" },
-  { id: "EMPATHY", label: "Empathy", group: "Stats" },
-  { id: "CHARISMA", label: "Charisma", group: "Stats" },
-  { id: "INTELLIGENCE", label: "Intelligence", group: "Stats" },
-  // Stat caps (ToA / drops only — not craftable)
-  { id: "CAP_STRENGTH", label: "Strength Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_CONSTITUTION", label: "Constitution Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_DEXTERITY", label: "Dexterity Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_QUICKNESS", label: "Quickness Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_ACUITY", label: "Acuity Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_PIETY", label: "Piety Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_EMPATHY", label: "Empathy Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_CHARISMA", label: "Charisma Cap", group: "Stat Caps (ToA)" },
-  { id: "CAP_HITPOINTS", label: "HP Cap", group: "Stat Caps (ToA)" },
-  // Vital
-  { id: "HITPOINTS", label: "Hit Points", group: "Vital" },
-  { id: "POWER_POOL", label: "Power %", group: "Vital", suffix: "%" },
-  // Resists
-  { id: "RES_CRUSH", label: "Crush Resist", group: "Resists", suffix: "%" },
-  { id: "RES_SLASH", label: "Slash Resist", group: "Resists", suffix: "%" },
-  { id: "RES_THRUST", label: "Thrust Resist", group: "Resists", suffix: "%" },
-  { id: "RES_HEAT", label: "Heat Resist", group: "Resists", suffix: "%" },
-  { id: "RES_COLD", label: "Cold Resist", group: "Resists", suffix: "%" },
-  { id: "RES_MATTER", label: "Matter Resist", group: "Resists", suffix: "%" },
-  { id: "RES_BODY", label: "Body Resist", group: "Resists", suffix: "%" },
-  { id: "RES_SPIRIT", label: "Spirit Resist", group: "Resists", suffix: "%" },
-  { id: "RES_ENERGY", label: "Energy Resist", group: "Resists", suffix: "%" },
-  // ToA bonuses
-  { id: "MELEE_DAMAGE",  label: "Melee Damage",   group: "ToA Bonuses", suffix: "%" },
-  { id: "MAGIC_DAMAGE",  label: "Magic Damage",   group: "ToA Bonuses", suffix: "%" },
-  { id: "STYLE_DAMAGE",  label: "Style Damage",   group: "ToA Bonuses", suffix: "%" },
-  { id: "ARCHERY_DMG",   label: "Archery Damage", group: "ToA Bonuses", suffix: "%" },
-  { id: "MELEE_SPEED",   label: "Melee Speed",    group: "ToA Bonuses", suffix: "%" },
-  { id: "ARCHERY_SPEED", label: "Archery Speed",  group: "ToA Bonuses", suffix: "%" },
-  { id: "CAST_SPEED",    label: "Casting Speed",  group: "ToA Bonuses", suffix: "%" },
-  { id: "SPELL_RANGE",   label: "Spell Range",    group: "ToA Bonuses", suffix: "%" },
-  { id: "SPELL_DURATION",label: "Spell Duration", group: "ToA Bonuses", suffix: "%" },
-  { id: "BUFF_BONUS",    label: "Buff Effectiveness", group: "ToA Bonuses", suffix: "%" },
-  { id: "DEBUFF_BONUS",  label: "Debuff Effectiveness", group: "ToA Bonuses", suffix: "%" },
-  { id: "HEAL_BONUS",    label: "Healing Effect", group: "ToA Bonuses", suffix: "%" },
-  { id: "FATIGUE",       label: "Fatigue",        group: "ToA Bonuses" },
-  { id: "POWER_POOL_FLAT", label: "Power Pool",   group: "ToA Bonuses" },
-];
-
 const MAX_EFFECTS = 10;
 
 export function CustomItemDialog({ open, onClose, slotLabel, defaultName, onSave }: Props) {
   const [name, setName] = useState(defaultName);
   const [effects, setEffects] = useState<ItemEffect[]>([]);
+  const [groups, setGroups] = useState<EffectGroup[]>([]);
 
   useEffect(() => {
     if (open) {
       setName(defaultName);
       setEffects([]);
+      setGroups([]);
     }
   }, [open, defaultName]);
-
-  const groups = useMemo(() => {
-    const by = new Map<string, typeof EFFECT_OPTIONS>();
-    for (const e of EFFECT_OPTIONS) {
-      const arr = by.get(e.group) ?? [];
-      arr.push(e);
-      by.set(e.group, arr);
-    }
-    return Array.from(by.entries());
-  }, []);
 
   function addEffect() {
     if (effects.length >= MAX_EFFECTS) return;
     setEffects((arr) => [...arr, { id: "STRENGTH", value: 1 }]);
+    setGroups((arr) => [...arr, "Stats"]);
   }
   function updateEffect(idx: number, patch: Partial<ItemEffect>) {
     setEffects((arr) => arr.map((e, i) => (i === idx ? { ...e, ...patch } : e)));
   }
   function removeEffect(idx: number) {
     setEffects((arr) => arr.filter((_, i) => i !== idx));
+    setGroups((arr) => arr.filter((_, i) => i !== idx));
+  }
+  function changeGroup(idx: number, group: EffectGroup) {
+    const first = EFFECT_OPTIONS.find((e) => e.group === group);
+    setGroups((arr) => arr.map((g, i) => (i === idx ? group : g)));
+    if (first) updateEffect(idx, { id: first.id });
   }
 
   return (
@@ -143,28 +88,24 @@ export function CustomItemDialog({ open, onClose, slotLabel, defaultName, onSave
             ) : (
               <div className="space-y-1.5 max-h-[40vh] overflow-y-auto pr-1">
                 {effects.map((eff, idx) => {
-                  const def = EFFECT_OPTIONS.find((e) => e.id === eff.id);
+                  const def = effectById(eff.id);
+                  const group = groups[idx] ?? def?.group ?? "Stats";
+                  const opts = EFFECT_OPTIONS.filter((o) => o.group === group);
                   return (
-                    <div key={idx} className="grid grid-cols-[1fr_90px_auto] gap-2 items-center">
-                      <Select
-                        value={eff.id}
-                        onValueChange={(v) => updateEffect(idx, { id: v })}
-                      >
-                        <SelectTrigger className="h-8 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
+                    <div key={idx} className="grid grid-cols-[1fr_1.4fr_90px_auto] gap-2 items-center">
+                      <Select value={group} onValueChange={(v) => changeGroup(idx, v as EffectGroup)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          {groups.map(([groupName, opts]) => (
-                            <div key={groupName}>
-                              <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-                                {groupName}
-                              </div>
-                              {opts.map((o) => (
-                                <SelectItem key={o.id} value={o.id} className="text-xs">
-                                  {o.label}
-                                </SelectItem>
-                              ))}
-                            </div>
+                          {EFFECT_GROUPS.map((g) => (
+                            <SelectItem key={g} value={g} className="text-xs">{g}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={eff.id} onValueChange={(v) => updateEffect(idx, { id: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {opts.map((o) => (
+                            <SelectItem key={o.id} value={o.id} className="text-xs">{o.label}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
