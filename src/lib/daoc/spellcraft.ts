@@ -145,6 +145,126 @@ const RESISTS = [
   { id: "RES_ENERGY", label: "Energy", family: "Light Shielding Jewel"   },
 ];
 
+/* ============================================================
+   Skills — per-realm list (canonical Eden / 1.124 spellcraft)
+   Each skill gem uses the "{Quality} {Skill} Crystal" naming.
+   Skill imbue scale: +1 = 1pt, +2 = 3pt, +3 = 5pt, +4 = 7pt, +5 = 9pt
+   ============================================================ */
+const SKILL_TABLE = [
+  { tier: 4,  value: 1, cost: 1, price:    900 },
+  { tier: 6,  value: 2, cost: 3, price:   8500 },
+  { tier: 7,  value: 3, cost: 5, price:  42000 },
+  { tier: 8,  value: 4, cost: 7, price: 140000 },
+  { tier: 9,  value: 5, cost: 9, price: 260000 },
+];
+
+interface SkillDef { id: string; label: string; realm: GemRealm }
+
+const SKILLS: SkillDef[] = [
+  // ───────── Albion ─────────
+  { id: "SKILL_TWO_HANDED",      label: "Two Handed",        realm: "Albion" },
+  { id: "SKILL_POLEARMS",        label: "Polearms",          realm: "Albion" },
+  { id: "SKILL_CRUSHING",        label: "Crush",             realm: "Albion" },
+  { id: "SKILL_SLASHING",        label: "Slash",             realm: "Albion" },
+  { id: "SKILL_THRUSTING",       label: "Thrust",            realm: "Albion" },
+  { id: "SKILL_SHIELDS",         label: "Shields",           realm: "Albion" },
+  { id: "SKILL_PARRY",           label: "Parry",             realm: "Albion" },
+  { id: "SKILL_DUAL_WIELD",      label: "Dual Wield",        realm: "Albion" },
+  { id: "SKILL_FLEXIBLE_WEAPON", label: "Flexible",          realm: "Albion" },
+  { id: "SKILL_STAFF",           label: "Staff",             realm: "Albion" },
+  { id: "SKILL_LONGBOWS",        label: "Longbow",           realm: "Albion" },
+  { id: "SKILL_CROSSBOW",        label: "Crossbow",          realm: "Albion" },
+  { id: "SKILL_STEALTH",         label: "Stealth",           realm: "Albion" },
+  { id: "SKILL_ENVENOM",         label: "Envenom",           realm: "Albion" },
+  { id: "SKILL_CRITICAL_STRIKE", label: "Critical Strike",   realm: "Albion" },
+  { id: "SKILL_INSTRUMENTS",     label: "Instruments",       realm: "Albion" },
+  { id: "SKILL_BODY_MAGIC",      label: "Body Magic",        realm: "Albion" },
+  { id: "SKILL_MIND_MAGIC",      label: "Mind Magic",        realm: "Albion" },
+  { id: "SKILL_SPIRIT_MAGIC",    label: "Spirit Magic",      realm: "Albion" },
+  { id: "SKILL_FIRE_MAGIC",      label: "Fire Magic",        realm: "Albion" },
+  { id: "SKILL_COLD_MAGIC",      label: "Cold Magic",        realm: "Albion" },
+  { id: "SKILL_EARTH_MAGIC",     label: "Earth Magic",       realm: "Albion" },
+  { id: "SKILL_WIND_MAGIC",      label: "Wind Magic",        realm: "Albion" },
+  { id: "SKILL_MATTER_MAGIC",    label: "Matter Magic",      realm: "Albion" },
+  { id: "SKILL_PAINWORKING",     label: "Painworking",       realm: "Albion" },
+  { id: "SKILL_DEATHSIGHT",      label: "Deathsight",        realm: "Albion" },
+  { id: "SKILL_DEATH_SERVANT",   label: "Death Servant",     realm: "Albion" },
+  { id: "SKILL_REJUVENATION",    label: "Rejuvenation",      realm: "Albion" },
+  { id: "SKILL_ENHANCEMENT",     label: "Enhancement",       realm: "Albion" },
+  { id: "SKILL_SMITE",           label: "Smiting",           realm: "Albion" },
+  { id: "SKILL_CHANTS",          label: "Chants",            realm: "Albion" },
+  { id: "SKILL_SOULRENDING",     label: "Soulrending",       realm: "Albion" },
+
+  // ───────── Hibernia ─────────
+  { id: "SKILL_BLADES",          label: "Blades",            realm: "Hibernia" },
+  { id: "SKILL_BLUNT",           label: "Blunt",             realm: "Hibernia" },
+  { id: "SKILL_PIERCING",        label: "Piercing",          realm: "Hibernia" },
+  { id: "SKILL_LARGE_WEAPON",    label: "Large Weapon",      realm: "Hibernia" },
+  { id: "SKILL_CELTIC_DUAL",     label: "Celtic Dual",       realm: "Hibernia" },
+  { id: "SKILL_CELTIC_SPEAR",    label: "Celtic Spear",      realm: "Hibernia" },
+  { id: "SKILL_RECURVE_BOW",     label: "Recurve Bow",       realm: "Hibernia" },
+  { id: "SKILL_SHIELDS_HIB",     label: "Shields",           realm: "Hibernia" },
+  { id: "SKILL_PARRY_HIB",       label: "Parry",             realm: "Hibernia" },
+  { id: "SKILL_STEALTH_HIB",     label: "Stealth",           realm: "Hibernia" },
+  { id: "SKILL_ENVENOM_HIB",     label: "Envenom",           realm: "Hibernia" },
+  { id: "SKILL_CRITICAL_STRIKE_HIB", label: "Critical Strike", realm: "Hibernia" },
+  { id: "SKILL_INSTRUMENTS_HIB", label: "Instruments",       realm: "Hibernia" },
+  { id: "SKILL_SCYTHE",          label: "Scythe",            realm: "Hibernia" },
+  { id: "SKILL_VALEWALKER_PATH", label: "Valewalker Path",   realm: "Hibernia" },
+  { id: "SKILL_LIGHT",           label: "Light",             realm: "Hibernia" },
+  { id: "SKILL_MANA",            label: "Mana",              realm: "Hibernia" },
+  { id: "SKILL_VOID",            label: "Void",              realm: "Hibernia" },
+  { id: "SKILL_ENCHANTMENTS",    label: "Enchantments",      realm: "Hibernia" },
+  { id: "SKILL_MENTALISM",       label: "Mentalism",         realm: "Hibernia" },
+  { id: "SKILL_NATURE",          label: "Nature",            realm: "Hibernia" },
+  { id: "SKILL_REGROWTH",        label: "Regrowth",          realm: "Hibernia" },
+  { id: "SKILL_NURTURE",         label: "Nurture",           realm: "Hibernia" },
+  { id: "SKILL_MUSIC",           label: "Music",             realm: "Hibernia" },
+  { id: "SKILL_VALOR",           label: "Valor",             realm: "Hibernia" },
+  { id: "SKILL_PATH_OF_FOCUS",   label: "Path of Focus",     realm: "Hibernia" },
+  { id: "SKILL_PATH_OF_ESSENCE", label: "Path of Essence",   realm: "Hibernia" },
+  { id: "SKILL_PATH_OF_AFFINITY",label: "Path of Affinity",  realm: "Hibernia" },
+  { id: "SKILL_CREEPING_PATH",   label: "Creeping Path",     realm: "Hibernia" },
+  { id: "SKILL_VERDANT_PATH",    label: "Verdant Path",      realm: "Hibernia" },
+  { id: "SKILL_ARBOREAL_PATH",   label: "Arboreal Path",     realm: "Hibernia" },
+  { id: "SKILL_PATH_OF_PHANTASMS", label: "Path of Phantasms", realm: "Hibernia" },
+  { id: "SKILL_PATH_OF_VOID",    label: "Path of the Void",  realm: "Hibernia" },
+  { id: "SKILL_PATH_OF_ETHER",   label: "Path of Ether",     realm: "Hibernia" },
+  { id: "SKILL_VAMPIIRIC_EMBRACE", label: "Vampiiric Embrace", realm: "Hibernia" },
+  { id: "SKILL_DEMENTIA",        label: "Dementia",          realm: "Hibernia" },
+
+  // ───────── Midgard ─────────
+  { id: "SKILL_SWORD",           label: "Sword",             realm: "Midgard" },
+  { id: "SKILL_AXE",             label: "Axe",               realm: "Midgard" },
+  { id: "SKILL_HAMMER",          label: "Hammer",            realm: "Midgard" },
+  { id: "SKILL_LEFT_AXE",        label: "Left Axe",          realm: "Midgard" },
+  { id: "SKILL_SPEAR",           label: "Spear",             realm: "Midgard" },
+  { id: "SKILL_HAND_TO_HAND",    label: "Hand to Hand",      realm: "Midgard" },
+  { id: "SKILL_COMPOSITE_BOW",   label: "Composite Bow",     realm: "Midgard" },
+  { id: "SKILL_THROWN_WEAPONS",  label: "Thrown Weapons",    realm: "Midgard" },
+  { id: "SKILL_SHIELDS_MID",     label: "Shields",           realm: "Midgard" },
+  { id: "SKILL_PARRY_MID",       label: "Parry",             realm: "Midgard" },
+  { id: "SKILL_STEALTH_MID",     label: "Stealth",           realm: "Midgard" },
+  { id: "SKILL_ENVENOM_MID",     label: "Envenom",           realm: "Midgard" },
+  { id: "SKILL_CRITICAL_STRIKE_MID", label: "Critical Strike", realm: "Midgard" },
+  { id: "SKILL_SUPPRESSION",     label: "Suppression",       realm: "Midgard" },
+  { id: "SKILL_RUNECARVING",     label: "Runecarving",       realm: "Midgard" },
+  { id: "SKILL_DARKNESS",        label: "Darkness",          realm: "Midgard" },
+  { id: "SKILL_SUMMONING",       label: "Summoning",         realm: "Midgard" },
+  { id: "SKILL_BONE_ARMY",       label: "Bone Army",         realm: "Midgard" },
+  { id: "SKILL_AUGMENTATION",    label: "Augmentation",      realm: "Midgard" },
+  { id: "SKILL_MENDING",         label: "Mending",           realm: "Midgard" },
+  { id: "SKILL_PACIFICATION",    label: "Pacification",      realm: "Midgard" },
+  { id: "SKILL_BATTLESONGS",     label: "Battlesongs",       realm: "Midgard" },
+  { id: "SKILL_STORMCALLING",    label: "Stormcalling",      realm: "Midgard" },
+  { id: "SKILL_BEASTCRAFT",      label: "Beastcraft",        realm: "Midgard" },
+  { id: "SKILL_SAVAGERY",        label: "Savagery",          realm: "Midgard" },
+  { id: "SKILL_ODINS_WILL",      label: "Odin's Will",       realm: "Midgard" },
+  { id: "SKILL_CURSING",         label: "Cursing",           realm: "Midgard" },
+  { id: "SKILL_HEXING",          label: "Hexing",            realm: "Midgard" },
+  { id: "SKILL_WITCHCRAFT",      label: "Witchcraft",        realm: "Midgard" },
+];
+
 function buildGems(): GemDef[] {
   const out: GemDef[] = [];
 
@@ -220,6 +340,27 @@ function buildGems(): GemDef[] {
       gemName: `${quality} ${family}`,
       price: t.price,
     });
+  }
+
+  for (const sk of SKILLS) {
+    for (const t of SKILL_TABLE) {
+      const quality = QUALITIES[t.tier - 1];
+      const family = `${sk.label} Crystal`;
+      out.push({
+        id: `skill_${sk.id.toLowerCase()}_${sk.realm.toLowerCase()}_t${t.tier}`,
+        label: `+${t.value} ${sk.label}`,
+        effectId: sk.id,
+        value: t.value,
+        cost: t.cost,
+        category: "skill",
+        tier: t.tier,
+        family,
+        quality,
+        gemName: `${quality} ${family}`,
+        price: t.price,
+        realm: sk.realm,
+      });
+    }
   }
 
   return out;
