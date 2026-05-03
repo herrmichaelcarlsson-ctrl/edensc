@@ -9,6 +9,8 @@ export interface EffectOption {
   group: EffectGroup;
   /** "%" for resists / ToA % bonuses */
   suffix?: string;
+  /** For Skills only — Albion / Hibernia / Midgard */
+  realm?: "Albion" | "Hibernia" | "Midgard";
 }
 
 export type EffectGroup =
@@ -69,6 +71,17 @@ export const EFFECT_OPTIONS: EffectOption[] = [
   { id: "HEAL_BONUS", label: "Healing Effect", group: "ToA Bonuses", suffix: "%" },
   { id: "POWER_POOL_FLAT", label: "Power Pool", group: "ToA Bonuses" },
 ];
+
+// Skills (mirrors SKILLS in spellcraft.ts so dropdowns line up)
+import { SKILLS } from "./spellcraft";
+for (const s of SKILLS) {
+  EFFECT_OPTIONS.push({
+    id: s.id,
+    label: `${s.label} (${s.realm.slice(0, 3)})`,
+    group: "Skills",
+    realm: s.realm,
+  });
+}
 
 export const EFFECT_GROUPS: EffectGroup[] = [
   "Stats", "Skills", "Resists", "Vital", "Stat Caps (ToA)", "ToA Bonuses",
