@@ -12,6 +12,7 @@ import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { SLOTS } from "@/lib/daoc/slots";
+import { EFFECT_OPTIONS, EFFECT_GROUPS, effectById, type EffectGroup } from "@/lib/daoc/effect-catalog";
 
 export const Route = createFileRoute("/items/submit")({
   head: () => ({
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/items/submit")({
   component: SubmitItemPage,
 });
 
-interface Eff { id: string; value: number }
+interface Eff { id: string; value: number; group: EffectGroup }
 
 function SubmitItemPage() {
   const { user, profile } = useAuth();
@@ -34,11 +35,15 @@ function SubmitItemPage() {
   const [origin, setOrigin] = useState("DROP");
   const [classRestriction, setClassRestriction] = useState("");
   const [notes, setNotes] = useState("");
-  const [effects, setEffects] = useState<Eff[]>([{ id: "STRENGTH", value: 10 }]);
+  const [effects, setEffects] = useState<Eff[]>([{ id: "STRENGTH", value: 10, group: "Stats" }]);
   const [busy, setBusy] = useState(false);
 
   function update(i: number, patch: Partial<Eff>) {
     setEffects((arr) => arr.map((e, idx) => idx === i ? { ...e, ...patch } : e));
+  }
+  function changeGroup(i: number, group: EffectGroup) {
+    const first = EFFECT_OPTIONS.find((o) => o.group === group);
+    update(i, { group, id: first?.id ?? "STRENGTH" });
   }
 
   async function submit(e: React.FormEvent) {
@@ -120,24 +125,41 @@ function SubmitItemPage() {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label>Bonuses</Label>
-                <Button type="button" size="sm" variant="outline" className="h-7"
-                  onClick={() => setEffects((a) => [...a, { id: "STRENGTH", value: 1 }])}>
+              <Button type="button" size="sm" variant="outline" className="h-7"
+                  onClick={() => setEffects((a) => [...a, { id: "STRENGTH", value: 1, group: "Stats" }])}>
                   <Plus className="h-3.5 w-3.5 mr-1" /> Add
                 </Button>
               </div>
-              {effects.map((eff, i) => (
-                <div key={i} className="grid grid-cols-[1fr_90px_auto] gap-2">
-                  <Input value={eff.id} onChange={(e) => update(i, { id: e.target.value.toUpperCase() })} className="h-8 text-xs" />
-                  <Input type="number" value={eff.value} onChange={(e) => update(i, { value: parseInt(e.target.value, 10) || 0 })} className="h-8 text-xs" />
-                  <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0"
-                    onClick={() => setEffects((a) => a.filter((_, j) => j !== i))}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              ))}
-              <p className="text-[11px] text-muted-foreground">
-                Effect IDs: STRENGTH, CONSTITUTION, RES_HEAT, CAP_STRENGTH, MELEE_DAMAGE, etc.
-              </p>
+              {effects.map((eff, i) => {
+                const def = effectById(eff.id);
+                const opts = EFFECT_OPTIONS.filter((o) => o.group === eff.group);
+                return (
+                  <div key={i} className="grid grid-cols-[1fr_1.4fr_90px_auto] gap-2 items-center">
+                    <Select value={eff.group} onValueChange={(v) => changeGroup(i, v as EffectGroup)}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {EFFECT_GROUPS.map((g) => <SelectItem key={g} value={g} className="text-xs">{g}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Select value={eff.id} onValueChange={(v) => update(i, { id: v })}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {opts.map((o) => <SelectItem key={o.id} value={o.id} className="text-xs">{o.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <div className="relative">
+                      <Input type="number" value={eff.value}
+                        onChange={(e) => update(i, { value: parseInt(e.target.value, 10) || 0 })}
+                        className="h-8 text-xs pr-6" />
+                      {def?.suffix && <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">{def.suffix}</span>}
+                    </div>
+                    <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0"
+                      onClick={() => setEffects((a) => a.filter((_, j) => j !== i))}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
 
             <div className="space-y-1.5">

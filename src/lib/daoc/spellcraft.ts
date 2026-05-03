@@ -158,9 +158,9 @@ const SKILL_TABLE = [
   { tier: 9,  value: 5, cost: 9, price: 260000 },
 ];
 
-interface SkillDef { id: string; label: string; realm: GemRealm }
+export interface SkillDef { id: string; label: string; realm: GemRealm }
 
-const SKILLS: SkillDef[] = [
+export const SKILLS: SkillDef[] = [
   // ───────── Albion ─────────
   { id: "SKILL_TWO_HANDED",      label: "Two Handed",        realm: "Albion" },
   { id: "SKILL_POLEARMS",        label: "Polearms",          realm: "Albion" },
