@@ -188,7 +188,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, re
           <div className="grid grid-cols-[1fr_1fr_auto] gap-2 items-end pt-1">
             <div className="flex flex-col gap-1">
               <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                {category === "resist" ? "Resist" : category === "hp" || category === "power" ? "Type" : "Stat"}
+                {category === "resist" ? "Resist" : category === "skill" ? "Skill" : category === "hp" || category === "power" ? "Type" : "Stat"}
               </label>
               <Select value={effectId} onValueChange={changeEffect}>
                 <SelectTrigger className="h-9 text-xs">
