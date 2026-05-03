@@ -13,7 +13,7 @@ import {
   type GemCategory,
   type GemSet,
 } from "@/lib/daoc/spellcraft";
-import type { DBItem, SlotKey } from "@/lib/daoc/types";
+import type { DBItem, Realm, SlotKey } from "@/lib/daoc/types";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -23,6 +23,7 @@ interface Props {
   item: DBItem | undefined;
   gems: GemSet;
   onChange: (gems: GemSet) => void;
+  realm: Realm | null;
 }
 
 const fmtPts = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
@@ -32,9 +33,10 @@ const CATEGORIES: { key: GemCategory; label: string }[] = [
   { key: "resist", label: "Resists" },
   { key: "hp", label: "Hit Points" },
   { key: "power", label: "Power" },
+  { key: "skill", label: "Skills" },
 ];
 
-export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: Props) {
+export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, realm }: Props) {
   const [category, setCategory] = useState<GemCategory>("stat");
   const [effectId, setEffectId] = useState<string>("");
   const [gemId, setGemId] = useState<string>("");
@@ -46,6 +48,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
     const map = new Map<string, { id: string; label: string }>();
     for (const g of GEMS) {
       if (g.category !== category) continue;
+      if (g.category === "skill" && realm && g.realm !== realm) continue;
       if (!map.has(g.effectId)) {
         // Strip the value/sign from gem label to get the bare stat name
         const label = g.label.replace(/^\+\d+%?\s*/, "").trim();
@@ -53,7 +56,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
       }
     }
     return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
-  }, [category]);
+  }, [category, realm]);
 
   const tiersForEffect = useMemo(() => {
     if (!effectId) return [];
@@ -164,7 +167,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange }: 
           <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Add gem</div>
 
           {/* Category */}
-          <div className="grid grid-cols-4 gap-1">
+          <div className="grid grid-cols-5 gap-1">
             {CATEGORIES.map((c) => (
               <button
                 key={c.key}
