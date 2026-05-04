@@ -53,6 +53,7 @@ function HomePage() {
     saveState({
       realm,
       className,
+      race,
       slots: prev?.realm === realm ? prev.slots : {},
       templateName: prev?.templateName ?? "Untitled Template",
     });
