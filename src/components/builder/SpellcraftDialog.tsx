@@ -13,6 +13,13 @@ import {
   type GemCategory,
   type GemSet,
 } from "@/lib/daoc/spellcraft";
+import {
+  calcImbueUsed,
+  calcOvercharge,
+  calcFailRisk,
+  riskLevel,
+  riskLabel,
+} from "@/lib/daoc/formulas";
 import type { DBItem, Realm, SlotKey } from "@/lib/daoc/types";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +45,25 @@ const CATEGORIES: { key: GemCategory; label: string }[] = [
 
 export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, realm }: Props) {
   const status = useMemo(() => inspectGems(gems), [gems]);
+  const risk = useMemo(() => {
+    const costs = status.gems.map((g) => g.cost);
+    const formulaImbue = calcImbueUsed(costs);
+    const oc = calcOvercharge(formulaImbue, SAFE_IMBUE_LIMIT);
+    return {
+      formulaImbue,
+      overcharge: oc,
+      pct: calcFailRisk(oc, { quality: 100, skillRatio: 1 }),
+      level: riskLevel(oc),
+    };
+  }, [status.gems]);
+
+  const RISK_COLOR: Record<ReturnType<typeof riskLevel>, string> = {
+    safe: "bg-status-capped",
+    moderate: "bg-status-near",
+    risky: "bg-amber-500",
+    very_risky: "bg-orange-600",
+    extreme: "bg-status-waste",
+  };
 
   function effectsForCategory(category: GemCategory) {
     const map = new Map<string, { id: string; label: string }>();
@@ -125,6 +151,40 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, re
               Overcharge — risk of critical failure
             </div>
           )}
+        </div>
+
+        {/* Risk meter (highest gem + rest/2 vs safe cap) */}
+        <div className="px-3 py-2 rounded-md border border-border bg-muted/10 space-y-1.5">
+          <div className="flex items-center justify-between text-[11px] tabular-nums">
+            <span className="text-muted-foreground">
+              Formula imbue <span className="text-foreground/80">{fmtPts(risk.formulaImbue)}</span>
+              {" · "}Overcharge{" "}
+              <span className={risk.overcharge > 0 ? "text-status-waste" : "text-foreground/80"}>
+                {fmtPts(risk.overcharge)}
+              </span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="text-muted-foreground">Fail risk</span>
+              <span className={cn("font-semibold", risk.pct > 20 ? "text-status-waste" : risk.pct > 5 ? "text-amber-500" : "text-status-capped")}>
+                {risk.pct.toFixed(1)}%
+              </span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                {riskLabel(risk.level)}
+              </span>
+            </span>
+          </div>
+          <div className="flex h-1.5 rounded overflow-hidden gap-px">
+            {(["safe", "moderate", "risky", "very_risky", "extreme"] as const).map((lvl) => (
+              <div
+                key={lvl}
+                className={cn(
+                  "flex-1 transition-opacity",
+                  RISK_COLOR[lvl],
+                  risk.level === lvl ? "opacity-100" : "opacity-25",
+                )}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Gem rows */}
