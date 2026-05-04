@@ -23,7 +23,7 @@ import { loadState, saveState } from "@/lib/daoc/storage";
 import { findRace } from "@/lib/daoc/races";
 import { exportTemplateText } from "@/lib/daoc/export";
 import { importZenkcraftText } from "@/lib/daoc/import";
-import { ArrowLeft, FileText, Save, Trash2, Download, Upload, Globe2 } from "lucide-react";
+import { ArrowLeft, FileText, Save, Trash2, Download, Upload, Globe2, GitCompare, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import type { ItemEffect } from "@/lib/daoc/types";
@@ -337,6 +337,12 @@ function BuilderPage() {
           <Button size="sm" variant="ghost" onClick={exportJson}>
             <Download className="h-4 w-4 mr-1.5" /> JSON
           </Button>
+          <Link to="/items/browse" className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground px-2 py-1.5">
+            <Search className="h-4 w-4 mr-1.5" /> Browse items
+          </Link>
+          <Link to="/compare" className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground px-2 py-1.5">
+            <GitCompare className="h-4 w-4 mr-1.5" /> Compare
+          </Link>
           <label className="inline-flex items-center text-sm cursor-pointer text-muted-foreground hover:text-foreground px-2 py-1.5 rounded">
             <Upload className="h-4 w-4 mr-1.5" /> Import
             <input type="file" accept="application/json,text/plain,.json,.txt" onChange={importJson} className="hidden" />
