@@ -18,6 +18,7 @@ import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ItemsSubmitRouteImport } from './routes/items.submit'
 import { Route as ItemsBrowseRouteImport } from './routes/items.browse'
+import { Route as AdminItemsRouteImport } from './routes/admin.items'
 import { Route as AdminFormulasRouteImport } from './routes/admin.formulas'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 
@@ -66,6 +67,11 @@ const ItemsBrowseRoute = ItemsBrowseRouteImport.update({
   path: '/items/browse',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminItemsRoute = AdminItemsRouteImport.update({
+  id: '/admin/items',
+  path: '/admin/items',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminFormulasRoute = AdminFormulasRouteImport.update({
   id: '/admin/formulas',
   path: '/admin/formulas',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/admin/items': typeof AdminItemsRoute
   '/items/browse': typeof ItemsBrowseRoute
   '/items/submit': typeof ItemsSubmitRoute
 }
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/admin/items': typeof AdminItemsRoute
   '/items/browse': typeof ItemsBrowseRoute
   '/items/submit': typeof ItemsSubmitRoute
 }
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/admin/items': typeof AdminItemsRoute
   '/items/browse': typeof ItemsBrowseRoute
   '/items/submit': typeof ItemsSubmitRoute
 }
@@ -129,6 +138,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/admin/items'
     | '/items/browse'
     | '/items/submit'
   fileRoutesByTo: FileRoutesByTo
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/admin/items'
     | '/items/browse'
     | '/items/submit'
   id:
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/admin/items'
     | '/items/browse'
     | '/items/submit'
   fileRoutesById: FileRoutesById
@@ -169,6 +181,7 @@ export interface RootRouteChildren {
   TemplatesRoute: typeof TemplatesRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
   AdminFormulasRoute: typeof AdminFormulasRoute
+  AdminItemsRoute: typeof AdminItemsRoute
   ItemsBrowseRoute: typeof ItemsBrowseRoute
   ItemsSubmitRoute: typeof ItemsSubmitRoute
 }
@@ -238,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ItemsBrowseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/items': {
+      id: '/admin/items'
+      path: '/admin/items'
+      fullPath: '/admin/items'
+      preLoaderRoute: typeof AdminItemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/formulas': {
       id: '/admin/formulas'
       path: '/admin/formulas'
@@ -265,6 +285,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemplatesRoute: TemplatesRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
   AdminFormulasRoute: AdminFormulasRoute,
+  AdminItemsRoute: AdminItemsRoute,
   ItemsBrowseRoute: ItemsBrowseRoute,
   ItemsSubmitRoute: ItemsSubmitRoute,
 }
