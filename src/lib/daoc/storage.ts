@@ -6,6 +6,7 @@ const KEY = "daoc-template-builder:state:v1";
 export interface PersistedState {
   realm: Realm | null;
   className: string | null;
+  race?: string | null;
   slots: TemplateSlots;
   templateName: string;
   spellcraft?: SpellcraftMap;
