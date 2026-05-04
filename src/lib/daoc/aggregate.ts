@@ -1,6 +1,7 @@
 import type { DBItem, ItemEffect, SlotKey, TemplateSlots } from "./types";
 import { CAPS, KNOWN_EFFECT_IDS, type CapDef } from "./caps";
 import { gemsToEffects, type SpellcraftMap } from "./spellcraft";
+import type { RaceDef } from "./races";
 
 export type StatStatus = "missing" | "near" | "capped" | "waste" | "neutral";
 
@@ -39,6 +40,7 @@ function statusFor(current: number, effectiveCap: number, kind: CapDef["kind"]):
 export function aggregate(
   itemsBySlot: Partial<Record<SlotKey, DBItem | undefined>>,
   spellcraft: SpellcraftMap = {},
+  race?: RaceDef | null,
 ): AggregateResult {
   const totals = new Map<string, number>();
 
@@ -50,6 +52,14 @@ export function aggregate(
     }
     for (const eff of gemsToEffects(spellcraft[slot])) {
       totals.set(eff.id, (totals.get(eff.id) ?? 0) + eff.value);
+    }
+  }
+
+  // Race innate resists (added on top of item totals).
+  if (race?.innateResists) {
+    for (const [id, value] of Object.entries(race.innateResists)) {
+      if (value == null) continue;
+      totals.set(id, (totals.get(id) ?? 0) + value);
     }
   }
 
