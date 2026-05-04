@@ -13,9 +13,11 @@ import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as BuilderRouteImport } from './routes/builder'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ItemsSubmitRouteImport } from './routes/items.submit'
+import { Route as ItemsBrowseRouteImport } from './routes/items.browse'
 import { Route as AdminFormulasRouteImport } from './routes/admin.formulas'
 import { Route as AdminFeedbackRouteImport } from './routes/admin.feedback'
 
@@ -39,6 +41,11 @@ const FeedbackRoute = FeedbackRouteImport.update({
   path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BuilderRoute = BuilderRouteImport.update({
   id: '/builder',
   path: '/builder',
@@ -52,6 +59,11 @@ const IndexRoute = IndexRouteImport.update({
 const ItemsSubmitRoute = ItemsSubmitRouteImport.update({
   id: '/items/submit',
   path: '/items/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItemsBrowseRoute = ItemsBrowseRouteImport.update({
+  id: '/items/browse',
+  path: '/items/browse',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminFormulasRoute = AdminFormulasRouteImport.update({
@@ -68,35 +80,41 @@ const AdminFeedbackRoute = AdminFeedbackRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
+  '/compare': typeof CompareRoute
   '/feedback': typeof FeedbackRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/items/browse': typeof ItemsBrowseRoute
   '/items/submit': typeof ItemsSubmitRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
+  '/compare': typeof CompareRoute
   '/feedback': typeof FeedbackRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/items/browse': typeof ItemsBrowseRoute
   '/items/submit': typeof ItemsSubmitRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/builder': typeof BuilderRoute
+  '/compare': typeof CompareRoute
   '/feedback': typeof FeedbackRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/templates': typeof TemplatesRoute
   '/admin/feedback': typeof AdminFeedbackRoute
   '/admin/formulas': typeof AdminFormulasRoute
+  '/items/browse': typeof ItemsBrowseRoute
   '/items/submit': typeof ItemsSubmitRoute
 }
 export interface FileRouteTypes {
@@ -104,46 +122,54 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/builder'
+    | '/compare'
     | '/feedback'
     | '/login'
     | '/reset-password'
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/items/browse'
     | '/items/submit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/builder'
+    | '/compare'
     | '/feedback'
     | '/login'
     | '/reset-password'
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/items/browse'
     | '/items/submit'
   id:
     | '__root__'
     | '/'
     | '/builder'
+    | '/compare'
     | '/feedback'
     | '/login'
     | '/reset-password'
     | '/templates'
     | '/admin/feedback'
     | '/admin/formulas'
+    | '/items/browse'
     | '/items/submit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BuilderRoute: typeof BuilderRoute
+  CompareRoute: typeof CompareRoute
   FeedbackRoute: typeof FeedbackRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TemplatesRoute: typeof TemplatesRoute
   AdminFeedbackRoute: typeof AdminFeedbackRoute
   AdminFormulasRoute: typeof AdminFormulasRoute
+  ItemsBrowseRoute: typeof ItemsBrowseRoute
   ItemsSubmitRoute: typeof ItemsSubmitRoute
 }
 
@@ -177,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/builder': {
       id: '/builder'
       path: '/builder'
@@ -196,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/items/submit'
       fullPath: '/items/submit'
       preLoaderRoute: typeof ItemsSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/items/browse': {
+      id: '/items/browse'
+      path: '/items/browse'
+      fullPath: '/items/browse'
+      preLoaderRoute: typeof ItemsBrowseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/formulas': {
@@ -218,12 +258,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BuilderRoute: BuilderRoute,
+  CompareRoute: CompareRoute,
   FeedbackRoute: FeedbackRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TemplatesRoute: TemplatesRoute,
   AdminFeedbackRoute: AdminFeedbackRoute,
   AdminFormulasRoute: AdminFormulasRoute,
+  ItemsBrowseRoute: ItemsBrowseRoute,
   ItemsSubmitRoute: ItemsSubmitRoute,
 }
 export const routeTree = rootRouteImport
