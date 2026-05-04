@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { CLASSES } from "@/lib/daoc/classes";
 import type { Realm } from "@/lib/daoc/types";
 import { saveState, loadState } from "@/lib/daoc/storage";
-import { Sword, Shield, Sparkles, LogIn, LogOut, LibraryBig, Plus } from "lucide-react";
+import { Sword, Shield, Sparkles, LogIn, LogOut, LibraryBig, Plus, Search, GitCompare } from "lucide-react";
 import { FeatureRequestsBoard } from "@/components/feature-requests/FeatureRequestsBoard";
 import { Toaster } from "@/components/ui/sonner";
 import realmsBg from "@/assets/realms-bg.png";
@@ -53,6 +53,7 @@ function HomePage() {
     saveState({
       realm,
       className,
+      race,
       slots: prev?.realm === realm ? prev.slots : {},
       templateName: prev?.templateName ?? "Untitled Template",
     });
@@ -74,6 +75,12 @@ function HomePage() {
         <Link to="/templates" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
           <LibraryBig className="h-3.5 w-3.5" /> Library
           {templateCount != null && <span className="text-muted-foreground ml-1">({templateCount})</span>}
+        </Link>
+        <Link to="/items/browse" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
+          <Search className="h-3.5 w-3.5" /> Items
+        </Link>
+        <Link to="/compare" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
+          <GitCompare className="h-3.5 w-3.5" /> Compare
         </Link>
         <Link to="/items/submit" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-card/60 hover:border-primary/50">
           <Plus className="h-3.5 w-3.5" /> Submit item

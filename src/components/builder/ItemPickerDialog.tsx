@@ -10,7 +10,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { itemAllowedForClass, armorAllowedForClass } from "@/lib/daoc/classes";
 import type { DBItem, Realm, SlotKey } from "@/lib/daoc/types";
 import { SLOT_BY_KEY } from "@/lib/daoc/slots";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+import { EFFECT_OPTIONS, EFFECT_GROUPS } from "@/lib/daoc/effect-catalog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface Props {
   open: boolean;
@@ -23,6 +25,7 @@ interface Props {
 
 export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick }: Props) {
   const [search, setSearch] = useState("");
+  const [statFilters, setStatFilters] = useState<string[]>([]);
   const [items, setItems] = useState<DBItem[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -53,13 +56,31 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return items
+    const list = items
       .filter((i) => itemAllowedForClass(i.class_restriction, className))
       .filter((i) => armorAllowedForClass(i.armor_type, className))
       .filter((i) => !q || i.name.toLowerCase().includes(q))
-      .sort((a, b) => (b.bonus_level ?? 0) - (a.bonus_level ?? 0))
-      .slice(0, 300);
-  }, [items, search, className]);
+      .filter((i) => {
+        if (statFilters.length === 0) return true;
+        const ids = new Set((i.effects ?? []).map((e) => e.id));
+        return statFilters.every((f) => ids.has(f));
+      });
+    if (statFilters.length > 0) {
+      // Sort by sum of selected stat values (highest first).
+      list.sort((a, b) => {
+        const sumA = (a.effects ?? []).reduce((s, e) => s + (statFilters.includes(e.id) ? e.value : 0), 0);
+        const sumB = (b.effects ?? []).reduce((s, e) => s + (statFilters.includes(e.id) ? e.value : 0), 0);
+        return sumB - sumA;
+      });
+    } else {
+      list.sort((a, b) => (b.bonus_level ?? 0) - (a.bonus_level ?? 0));
+    }
+    return list.slice(0, 300);
+  }, [items, search, className, statFilters]);
+
+  function toggleStat(id: string) {
+    setStatFilters((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  }
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -78,6 +99,64 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
+        {/* Stat filter chips */}
+        <div className="flex items-center flex-wrap gap-1.5 -mt-1">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button size="sm" variant="outline" className="h-7 text-xs">
+                + Filter by stat
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-0 max-h-80 overflow-auto">
+              {EFFECT_GROUPS.map((group) => {
+                const opts = EFFECT_OPTIONS.filter((o) => o.group === group);
+                if (!opts.length) return null;
+                return (
+                  <div key={group} className="border-b border-border last:border-0">
+                    <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/40">
+                      {group}
+                    </div>
+                    <div className="flex flex-wrap gap-1 p-2">
+                      {opts.map((o) => {
+                        const active = statFilters.includes(o.id);
+                        return (
+                          <button
+                            key={o.id}
+                            onClick={() => toggleStat(o.id)}
+                            className={`text-[11px] px-2 py-0.5 rounded border transition-colors ${
+                              active
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "border-border hover:border-primary/50"
+                            }`}
+                          >
+                            {o.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </PopoverContent>
+          </Popover>
+          {statFilters.map((id) => {
+            const opt = EFFECT_OPTIONS.find((o) => o.id === id);
+            return (
+              <Badge key={id} variant="secondary" className="text-[10px] gap-1 pr-1">
+                {opt?.label ?? id}
+                <button onClick={() => toggleStat(id)} className="hover:text-destructive">
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            );
+          })}
+          {statFilters.length > 0 && (
+            <Button size="sm" variant="ghost" className="h-6 text-[10px]" onClick={() => setStatFilters([])}>
+              Clear
+            </Button>
+          )}
+        </div>
         <ScrollArea className="h-[60vh] rounded-md border border-border">
           {loading ? (
             <div className="flex items-center justify-center p-12 text-muted-foreground">
