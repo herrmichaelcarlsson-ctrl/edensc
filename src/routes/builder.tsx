@@ -10,6 +10,8 @@ import { SlotCard } from "@/components/builder/SlotCard";
 import { StatsPanel } from "@/components/builder/StatsPanel";
 import { SpellcraftDialog } from "@/components/builder/SpellcraftDialog";
 import { SuggestionsPanel } from "@/components/builder/SuggestionsPanel";
+import { GearScorePanel } from "@/components/builder/GearScorePanel";
+import { ResistHolePanel } from "@/components/builder/ResistHolePanel";
 import { SlotActionDialog } from "@/components/builder/SlotActionDialog";
 import { CustomItemDialog } from "@/components/builder/CustomItemDialog";
 import { SLOTS } from "@/lib/daoc/slots";
@@ -18,6 +20,7 @@ import { aggregate } from "@/lib/daoc/aggregate";
 import { isCraftable, inspectGems, type SpellcraftMap } from "@/lib/daoc/spellcraft";
 import { suggestGems } from "@/lib/daoc/suggest";
 import { loadState, saveState } from "@/lib/daoc/storage";
+import { findRace } from "@/lib/daoc/races";
 import { exportTemplateText } from "@/lib/daoc/export";
 import { importZenkcraftText } from "@/lib/daoc/import";
 import { ArrowLeft, FileText, Save, Trash2, Download, Upload, Globe2 } from "lucide-react";
@@ -39,6 +42,7 @@ function BuilderPage() {
   const navigate = useNavigate();
   const [realm, setRealm] = useState<Realm | null>(null);
   const [className, setClassName] = useState<string | null>(null);
+  const [race, setRace] = useState<string | null>(null);
   const [templateName, setTemplateName] = useState("Untitled Template");
   const [slots, setSlots] = useState<TemplateSlots>({});
   const [actionSlot, setActionSlot] = useState<SlotKey | null>(null);
@@ -57,6 +61,7 @@ function BuilderPage() {
     }
     setRealm(s.realm);
     setClassName(s.className);
+    setRace(s.race ?? null);
     setSlots(s.slots ?? {});
     setTemplateName(s.templateName ?? "Untitled Template");
     setSpellcraft(s.spellcraft ?? {});
@@ -85,8 +90,8 @@ function BuilderPage() {
   // Persist
   useEffect(() => {
     if (!realm) return;
-    saveState({ realm, className, slots, templateName, spellcraft });
-  }, [realm, className, slots, templateName, spellcraft]);
+    saveState({ realm, className, race, slots, templateName, spellcraft });
+  }, [realm, className, race, slots, templateName, spellcraft]);
 
   const itemsBySlot = useMemo(() => {
     const map: Partial<Record<SlotKey, DBItem | undefined>> = {};
@@ -97,7 +102,8 @@ function BuilderPage() {
     return map;
   }, [slots, itemsCache]);
 
-  const agg = useMemo(() => aggregate(itemsBySlot, spellcraft), [itemsBySlot, spellcraft]);
+  const raceDef = useMemo(() => findRace(realm, race), [realm, race]);
+  const agg = useMemo(() => aggregate(itemsBySlot, spellcraft, raceDef), [itemsBySlot, spellcraft, raceDef]);
   const suggestions = useMemo(() => suggestGems(agg), [agg]);
 
   const gemTotals = useMemo(() => {
@@ -403,6 +409,12 @@ function BuilderPage() {
         <aside className="lg:sticky lg:top-[68px] lg:self-start">
           <Card className="p-5 bg-card/80 backdrop-blur space-y-5">
             <StatsPanel agg={agg} />
+            <div className="border-t border-border/60 pt-4">
+              <GearScorePanel agg={agg} />
+            </div>
+            <div className="border-t border-border/60 pt-4">
+              <ResistHolePanel agg={agg} />
+            </div>
             <div className="border-t border-border/60 pt-4">
               <SuggestionsPanel
                 result={suggestions}
