@@ -87,7 +87,7 @@ export const CAPS: Record<string, CapDef> = {
     effectIds: ["POWER_POOL", "POWER"],
     itemCap: 26,
     hardCap: 51,
-    capBonusEffectIds: ["CAP_POWER"],
+    capBonusEffectIds: ["CAP_POWER", "CAP_POWER_POOL"],
     maxCapBonus: 25,
     kind: "power",
     group: "vital",
