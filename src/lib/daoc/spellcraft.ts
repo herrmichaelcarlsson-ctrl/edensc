@@ -13,6 +13,7 @@
 import type { DBItem } from "./types";
 
 export type GemCategory = "stat" | "resist" | "skill" | "cap" | "hp" | "power";
+export type SkillRealm = "Albion" | "Hibernia" | "Midgard";
 
 export interface GemDef {
   id: string;
@@ -26,6 +27,8 @@ export interface GemDef {
   gemName: string;
   quality: string;
   family: string;
+  /** Realm restriction (only set for skill gems). */
+  realm?: SkillRealm;
 }
 
 const QUALITIES_10 = [
