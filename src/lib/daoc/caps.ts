@@ -36,12 +36,14 @@ const stat = (label: string, id: string, capId?: string): CapDef => ({
 });
 
 /* ---------- RESISTS ---------- */
-const resist = (label: string, id: string, capId?: string): CapDef => ({
+const resist = (label: string, id: string): CapDef => ({
   label,
   effectIds: [id],
+  // Item cap is 26%. Racial bonuses raise the cap by +5 (not the current
+  // value), so a Saracen Heat-resist build can reach 26 + 5 = 31%.
   itemCap: 26,
   hardCap: 26 + 5,
-  capBonusEffectIds: capId ? [capId] : [],
+  capBonusEffectIds: [`${id}_CAP`],
   maxCapBonus: 5,
   kind: "resist",
   group: "resist",
@@ -134,6 +136,7 @@ export const CAPS: Record<string, CapDef> = {
   ALL_MAGIC_BONUS: bonusPct("All Magic Skills", "ALL_MAGIC_BONUS", 11),
   ALL_MELEE_BONUS: bonusPct("All Melee Skills", "ALL_MELEE_BONUS", 11),
   ALL_DUAL_BONUS: bonusPct("All Dual Skills", "ALL_DUAL_BONUS", 11),
+  ARCANE_SIPHON: bonusPct("Arcane Siphon", "ARCANE_SIPHON", 25),
 };
 
 /** All effect IDs we know about — anything else is treated as a generic skill. */
