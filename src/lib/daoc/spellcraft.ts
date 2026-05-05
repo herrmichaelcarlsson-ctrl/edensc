@@ -124,6 +124,77 @@ const RESISTS = [
   { id: "RES_ENERGY", label: "Energy", family: "Light Shielding Jewel"   },
 ];
 
+/**
+ * Realm-specific weapon / magic skills available as Spellcraft gems.
+ * Values follow the same scaling as stat gems (+1..+5).
+ */
+export const SKILLS: { id: string; label: string; realm: SkillRealm; family: string }[] = [
+  // Albion
+  { id: "TWO_HANDED",        label: "Two Handed",        realm: "Albion",   family: "Adept Crystal" },
+  { id: "CRUSH",             label: "Crush",             realm: "Albion",   family: "Adept Crystal" },
+  { id: "SLASH",             label: "Slash",             realm: "Albion",   family: "Adept Crystal" },
+  { id: "THRUST",            label: "Thrust",            realm: "Albion",   family: "Adept Crystal" },
+  { id: "POLEARM",           label: "Polearm",           realm: "Albion",   family: "Adept Crystal" },
+  { id: "STAFF",             label: "Staff",             realm: "Albion",   family: "Adept Crystal" },
+  { id: "PARRY",             label: "Parry",             realm: "Albion",   family: "Adept Crystal" },
+  { id: "SHIELD",            label: "Shield",            realm: "Albion",   family: "Adept Crystal" },
+  { id: "STEALTH",           label: "Stealth",           realm: "Albion",   family: "Adept Crystal" },
+  { id: "ENVENOM",           label: "Envenom",           realm: "Albion",   family: "Adept Crystal" },
+  { id: "CRITICAL_STRIKE",   label: "Critical Strike",   realm: "Albion",   family: "Adept Crystal" },
+  { id: "DUAL_WIELD",        label: "Dual Wield",        realm: "Albion",   family: "Adept Crystal" },
+  { id: "BODY_MAGIC",        label: "Body Magic",        realm: "Albion",   family: "Mage Crystal" },
+  { id: "COLD_MAGIC",        label: "Cold Magic",        realm: "Albion",   family: "Mage Crystal" },
+  { id: "EARTH_MAGIC",       label: "Earth Magic",       realm: "Albion",   family: "Mage Crystal" },
+  { id: "FIRE_MAGIC",        label: "Fire Magic",        realm: "Albion",   family: "Mage Crystal" },
+  { id: "MIND_MAGIC",        label: "Mind Magic",        realm: "Albion",   family: "Mage Crystal" },
+  { id: "WIND_MAGIC",        label: "Wind Magic",        realm: "Albion",   family: "Mage Crystal" },
+  { id: "SPIRIT_MAGIC",      label: "Spirit Magic",      realm: "Albion",   family: "Mage Crystal" },
+  { id: "MATTER_MAGIC",      label: "Matter Magic",      realm: "Albion",   family: "Mage Crystal" },
+  { id: "REJUVENATION",      label: "Rejuvenation",      realm: "Albion",   family: "Mage Crystal" },
+  { id: "ENHANCEMENT",       label: "Enhancement",       realm: "Albion",   family: "Mage Crystal" },
+  { id: "SMITE",             label: "Smite",             realm: "Albion",   family: "Mage Crystal" },
+  { id: "PAINWORKING",       label: "Painworking",       realm: "Albion",   family: "Mage Crystal" },
+  { id: "DEATH_SERVANT",     label: "Death Servant",     realm: "Albion",   family: "Mage Crystal" },
+  { id: "DEATH_SIGHT",       label: "Deathsight",        realm: "Albion",   family: "Mage Crystal" },
+  { id: "SOULRENDING",       label: "Soulrending",       realm: "Albion",   family: "Mage Crystal" },
+  // Hibernia
+  { id: "BLADES",            label: "Blades",            realm: "Hibernia", family: "Adept Crystal" },
+  { id: "BLUNT",             label: "Blunt",             realm: "Hibernia", family: "Adept Crystal" },
+  { id: "PIERCING",          label: "Piercing",          realm: "Hibernia", family: "Adept Crystal" },
+  { id: "LARGE_WEAPONRY",    label: "Large Weaponry",    realm: "Hibernia", family: "Adept Crystal" },
+  { id: "CELTIC_DUAL",       label: "Celtic Dual",       realm: "Hibernia", family: "Adept Crystal" },
+  { id: "RECURVE_BOW",       label: "Recurve Bow",       realm: "Hibernia", family: "Adept Crystal" },
+  { id: "STEALTH_HIB",       label: "Stealth",           realm: "Hibernia", family: "Adept Crystal" },
+  { id: "SCYTHE",            label: "Scythe",            realm: "Hibernia", family: "Adept Crystal" },
+  { id: "MENTALISM",         label: "Mentalism",         realm: "Hibernia", family: "Mage Crystal" },
+  { id: "LIGHT",             label: "Light",             realm: "Hibernia", family: "Mage Crystal" },
+  { id: "VOID",              label: "Void",              realm: "Hibernia", family: "Mage Crystal" },
+  { id: "MANA",              label: "Mana",              realm: "Hibernia", family: "Mage Crystal" },
+  { id: "ENCHANTMENTS",      label: "Enchantments",      realm: "Hibernia", family: "Mage Crystal" },
+  { id: "NURTURE",           label: "Nurture",           realm: "Hibernia", family: "Mage Crystal" },
+  { id: "REGROWTH",          label: "Regrowth",          realm: "Hibernia", family: "Mage Crystal" },
+  { id: "MUSIC",             label: "Music",             realm: "Hibernia", family: "Mage Crystal" },
+  { id: "VALOR",              label: "Valor",            realm: "Hibernia", family: "Mage Crystal" },
+  // Midgard
+  { id: "AXE",               label: "Axe",               realm: "Midgard",  family: "Adept Crystal" },
+  { id: "HAMMER",            label: "Hammer",            realm: "Midgard",  family: "Adept Crystal" },
+  { id: "SWORD",             label: "Sword",             realm: "Midgard",  family: "Adept Crystal" },
+  { id: "SPEAR",             label: "Spear",             realm: "Midgard",  family: "Adept Crystal" },
+  { id: "LEFT_AXE",          label: "Left Axe",          realm: "Midgard",  family: "Adept Crystal" },
+  { id: "COMPOSITE_BOW",     label: "Composite Bow",     realm: "Midgard",  family: "Adept Crystal" },
+  { id: "STEALTH_MID",       label: "Stealth",           realm: "Midgard",  family: "Adept Crystal" },
+  { id: "PARRY_MID",         label: "Parry",             realm: "Midgard",  family: "Adept Crystal" },
+  { id: "DARKNESS",          label: "Darkness",          realm: "Midgard",  family: "Mage Crystal" },
+  { id: "RUNECARVING",       label: "Runecarving",       realm: "Midgard",  family: "Mage Crystal" },
+  { id: "SUPPRESSION",       label: "Suppression",       realm: "Midgard",  family: "Mage Crystal" },
+  { id: "BATTLESONGS",       label: "Battlesongs",       realm: "Midgard",  family: "Mage Crystal" },
+  { id: "AUGMENTATION",      label: "Augmentation",      realm: "Midgard",  family: "Mage Crystal" },
+  { id: "MENDING",           label: "Mending",           realm: "Midgard",  family: "Mage Crystal" },
+  { id: "PACIFICATION",      label: "Pacification",      realm: "Midgard",  family: "Mage Crystal" },
+  { id: "BONE_ARMY",         label: "Bone Army",         realm: "Midgard",  family: "Mage Crystal" },
+  { id: "STORMCALLING",      label: "Stormcalling",      realm: "Midgard",  family: "Mage Crystal" },
+];
+
 function buildGems(): GemDef[] {
   const out: GemDef[] = [];
 
@@ -195,6 +266,27 @@ function buildGems(): GemDef[] {
       quality,
       gemName: `${quality} ${family}`,
     });
+  }
+
+  // Skill gems: tiers 1..5 (+1..+5), reuse stat costs.
+  for (const sk of SKILLS) {
+    for (let tier = 1; tier <= 5; tier++) {
+      const t = STAT_TABLE[tier - 1];
+      const quality = QUALITIES_10[tier - 1];
+      out.push({
+        id: `skill_${sk.id.toLowerCase()}_t${tier}`,
+        label: `+${tier} ${sk.label}`,
+        effectId: sk.id,
+        value: tier,
+        cost: t.cost,
+        category: "skill",
+        tier,
+        family: sk.family,
+        quality,
+        gemName: `${quality} ${sk.family}`,
+        realm: sk.realm,
+      });
+    }
   }
 
   return out;
