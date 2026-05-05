@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -7,8 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowUp, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowUp, Loader2, Sparkles, ExternalLink, Download } from "lucide-react";
 import { getVoterKey } from "@/lib/voter";
+import { saveState } from "@/lib/daoc/storage";
+import type { Realm, TemplateSlots } from "@/lib/daoc/types";
+import type { SpellcraftMap } from "@/lib/daoc/spellcraft";
 
 export const Route = createFileRoute("/templates")({
   head: () => ({
@@ -34,6 +37,7 @@ interface Row {
 }
 
 function TemplatesPage() {
+  const navigate = useNavigate();
   const [rows, setRows] = useState<Row[]>([]);
   const [voted, setVoted] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -73,6 +77,45 @@ function TemplatesPage() {
       setVoted((s) => new Set(s).add(id));
       setRows((r) => r.map((x) => x.id === id ? { ...x, vote_count: x.vote_count + 1 } : x));
     }
+  }
+
+  async function openInBuilder(id: string) {
+    const { data, error } = await supabase
+      .from("saved_templates")
+      .select("name,realm,class_name,slots,spellcraft")
+      .eq("id", id)
+      .maybeSingle();
+    if (error || !data) return toast.error(error?.message ?? "Template not found");
+    saveState({
+      realm: data.realm as Realm,
+      className: data.class_name ?? null,
+      race: null,
+      slots: (data.slots ?? {}) as TemplateSlots,
+      templateName: data.name,
+      spellcraft: (data.spellcraft ?? {}) as SpellcraftMap,
+    });
+    toast.success("Loaded — opening builder");
+    navigate({ to: "/builder" });
+  }
+
+  async function downloadTemplate(id: string, name: string) {
+    const { data, error } = await supabase
+      .from("saved_templates")
+      .select("name,realm,class_name,slots,spellcraft")
+      .eq("id", id)
+      .maybeSingle();
+    if (error || !data) return toast.error(error?.message ?? "Template not found");
+    const blob = new Blob(
+      [JSON.stringify({ name: data.name, realm: data.realm, className: data.class_name, slots: data.slots, spellcraft: data.spellcraft }, null, 2)],
+      { type: "application/json" },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${name.replace(/[^a-z0-9]+/gi, "_")}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Downloaded");
   }
 
   const filtered = useMemo(() => {
@@ -142,6 +185,12 @@ function TemplatesPage() {
                     toast.success("Share link copied");
                   }}>Share</Button>
                 )}
+                <Button size="sm" variant="outline" onClick={() => downloadTemplate(t.id, t.name)}>
+                  <Download className="h-3.5 w-3.5 mr-1" /> JSON
+                </Button>
+                <Button size="sm" onClick={() => openInBuilder(t.id)}>
+                  <ExternalLink className="h-3.5 w-3.5 mr-1" /> Open
+                </Button>
               </Card>
             ))}
           </div>

@@ -22,6 +22,8 @@ import {
 } from "@/lib/daoc/formulas";
 import type { DBItem, Realm, SlotKey } from "@/lib/daoc/types";
 import { cn } from "@/lib/utils";
+import { StatsPanel } from "./StatsPanel";
+import type { AggregateResult } from "@/lib/daoc/aggregate";
 
 interface Props {
   open: boolean;
@@ -31,6 +33,9 @@ interface Props {
   gems: GemSet;
   onChange: (gems: GemSet) => void;
   realm: Realm | null;
+  /** Current full-character aggregate (re-computed live in the parent so
+   *  the dialog reflects gem changes immediately). */
+  agg?: AggregateResult;
 }
 
 const fmtPts = (n: number) => (Number.isInteger(n) ? `${n}` : n.toFixed(1));
@@ -43,7 +48,7 @@ const CATEGORIES: { key: GemCategory; label: string }[] = [
   { key: "power", label: "Power" },
 ];
 
-export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, realm }: Props) {
+export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, realm, agg }: Props) {
   const status = useMemo(() => inspectGems(gems), [gems]);
   const risk = useMemo(() => {
     const costs = status.gems.map((g) => g.cost);
@@ -120,7 +125,7 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, re
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle className="font-display flex items-center gap-2">
             Spellcraft
@@ -128,6 +133,8 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, re
           </DialogTitle>
         </DialogHeader>
 
+        <div className="grid md:grid-cols-[1fr_320px] gap-4">
+          <div className="space-y-3 min-w-0">
         {/* Status header */}
         <div className="flex items-center gap-3 p-3 rounded-md border border-border bg-muted/30">
           <div className="flex flex-col">
@@ -273,6 +280,13 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, re
 
         <div className="flex justify-end pt-2">
           <Button onClick={onClose} variant="secondary" size="sm">Done</Button>
+        </div>
+          </div>
+          {agg && (
+            <aside className="border-l border-border md:pl-4 max-h-[70vh] overflow-y-auto">
+              <StatsPanel agg={agg} />
+            </aside>
+          )}
         </div>
       </DialogContent>
     </Dialog>

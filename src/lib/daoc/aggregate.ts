@@ -55,11 +55,14 @@ export function aggregate(
     }
   }
 
-  // Race innate resists (added on top of item totals).
+  // Race innate resists raise the resist CAP by N, they don't flat-add to the
+  // current resist value. We push them into RES_*_CAP buckets so the engine
+  // applies them as a cap bonus (matching DAoC live behaviour).
   if (race?.innateResists) {
     for (const [id, value] of Object.entries(race.innateResists)) {
       if (value == null) continue;
-      totals.set(id, (totals.get(id) ?? 0) + value);
+      const capId = id.startsWith("RES_") ? `${id}_CAP` : id;
+      totals.set(capId, (totals.get(capId) ?? 0) + value);
     }
   }
 
