@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus, Gem } from "lucide-react";
 import type { DBItem, SlotKey } from "@/lib/daoc/types";
 import { SLOT_BY_KEY } from "@/lib/daoc/slots";
-import { isCraftable, inspectGems, MAX_GEMS_PER_ITEM, type GemSet } from "@/lib/daoc/spellcraft";
+import { isCraftable, inspectGems, gemsToEffects, MAX_GEMS_PER_ITEM, type GemSet } from "@/lib/daoc/spellcraft";
+import { effectById } from "@/lib/daoc/effect-catalog";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -19,6 +19,28 @@ export function SlotCard({ slotKey, item, gems = [], onPick, onClear, onSpellcra
   const def = SLOT_BY_KEY[slotKey];
   const craftable = isCraftable(item);
   const status = inspectGems(gems);
+
+  // Combined effects: item base + spellcraft gems.
+  const combined: { id: string; value: number }[] = (() => {
+    const map = new Map<string, number>();
+    for (const e of item?.effects ?? []) map.set(e.id, (map.get(e.id) ?? 0) + e.value);
+    for (const e of gemsToEffects(gems)) map.set(e.id, (map.get(e.id) ?? 0) + e.value);
+    return Array.from(map, ([id, value]) => ({ id, value }));
+  })();
+
+  const isCraftedShell = !!item && (item.origin === "CRAFTED" || item.source_type === "CRAFTED")
+    && (item.effects ?? []).length === 0;
+  const displayName = isCraftedShell && combined.length > 0
+    ? `Crafted ${def.label} (${combined.length} gem${combined.length > 1 ? "s" : ""})`
+    : item?.name ?? "";
+
+  function fmtEffect(id: string, value: number) {
+    const opt = effectById(id);
+    const label = opt?.label ?? id.replace(/_/g, " ");
+    const suffix = opt?.suffix ?? "";
+    return `+${value}${suffix} ${label}`;
+  }
+
   return (
     <div className="rounded-md border border-border bg-card/60 backdrop-blur-sm hover:border-primary/40 transition-colors">
       <div className="flex items-center justify-between px-3 py-2 border-b border-border/60">
@@ -59,15 +81,21 @@ export function SlotCard({ slotKey, item, gems = [], onPick, onClear, onSpellcra
         {item ? (
           <>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-medium leading-tight line-clamp-2">{item.name}</span>
+              <span className="text-sm font-medium leading-tight line-clamp-2">{displayName}</span>
             </div>
-            <div className="flex flex-wrap gap-1 mt-0.5">
-              {(item.effects ?? []).slice(0, 4).map((e, i) => (
-                <span key={i} className="text-[9px] text-muted-foreground">
-                  +{e.value} {e.id.replace(/_/g, " ").slice(0, 12)}
-                </span>
-              ))}
-            </div>
+            {combined.length > 0 && (
+              <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-0.5">
+                {combined.map((e, i) => (
+                  <span
+                    key={i}
+                    className="text-[10px] text-foreground/80 tabular-nums"
+                    title={fmtEffect(e.id, e.value)}
+                  >
+                    {fmtEffect(e.id, e.value)}
+                  </span>
+                ))}
+              </div>
+            )}
             {item.class_restriction && (
               <Badge variant="outline" className="self-start mt-0.5 text-[9px]">
                 {item.class_restriction}
