@@ -1,5 +1,6 @@
 import type { AggregateResult, AggregatedStat } from "@/lib/daoc/aggregate";
 import { cn } from "@/lib/utils";
+import { CLASS_ACUITY } from "@/lib/daoc/classes";
 
 function StatRow({ s }: { s: AggregatedStat }) {
   const showCap = s.effectiveCap;
@@ -50,8 +51,13 @@ function Section({ title, stats }: { title: string; stats: AggregatedStat[] }) {
   );
 }
 
-export function StatsPanel({ agg }: { agg: AggregateResult }) {
-  const stats = agg.stats;
+export function StatsPanel({ agg, className }: { agg: AggregateResult; className?: string | null }) {
+  // Hide the duplicate "Acuity" row and rename the class-relevant casting stat
+  // (Intelligence / Piety / Empathy / Charisma) to "Acuity (X)".
+  const acuityKey = className ? CLASS_ACUITY[className] : null;
+  const stats = agg.stats
+    .filter((s) => !(acuityKey && s.key === "ACUITY"))
+    .map((s) => (acuityKey && s.key === acuityKey ? { ...s, label: `Acuity (${s.label})` } : s));
   const primaryStats = stats.filter((s) => s.group === "stat");
   const vital = stats.filter((s) => s.group === "vital");
   const resists = stats.filter((s) => s.group === "resist");
