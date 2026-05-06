@@ -414,7 +414,7 @@ function BuilderPage() {
         {/* Stats panel */}
         <aside className="lg:sticky lg:top-[68px] lg:self-start">
           <Card className="p-5 bg-card/80 backdrop-blur space-y-5">
-            <StatsPanel agg={agg} />
+            <StatsPanel agg={agg} className={className} />
             <div className="border-t border-border/60 pt-4">
               <GearScorePanel agg={agg} />
             </div>
