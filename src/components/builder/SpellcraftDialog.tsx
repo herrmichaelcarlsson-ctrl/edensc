@@ -24,6 +24,7 @@ import type { DBItem, Realm, SlotKey } from "@/lib/daoc/types";
 import { cn } from "@/lib/utils";
 import { StatsPanel } from "./StatsPanel";
 import type { AggregateResult } from "@/lib/daoc/aggregate";
+import { CLASS_SKILLS } from "@/lib/daoc/classes";
 
 interface Props {
   open: boolean;
@@ -33,6 +34,7 @@ interface Props {
   gems: GemSet;
   onChange: (gems: GemSet) => void;
   realm: Realm | null;
+  className?: string | null;
   /** Current full-character aggregate (re-computed live in the parent so
    *  the dialog reflects gem changes immediately). */
   agg?: AggregateResult;
@@ -48,7 +50,7 @@ const CATEGORIES: { key: GemCategory; label: string }[] = [
   { key: "power", label: "Power" },
 ];
 
-export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, realm, agg }: Props) {
+export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, realm, className, agg }: Props) {
   const status = useMemo(() => inspectGems(gems), [gems]);
   const risk = useMemo(() => {
     const costs = status.gems.map((g) => g.cost);
@@ -72,9 +74,11 @@ export function SpellcraftDialog({ open, onClose, slot, item, gems, onChange, re
 
   function effectsForCategory(category: GemCategory) {
     const map = new Map<string, { id: string; label: string }>();
+    const classSkills = className ? CLASS_SKILLS[className] : null;
     for (const g of GEMS) {
       if (g.category !== category) continue;
       if (g.category === "skill" && realm && g.realm !== realm) continue;
+      if (g.category === "skill" && classSkills && !classSkills.includes(g.effectId)) continue;
       if (!map.has(g.effectId)) {
         const label = g.label.replace(/^\+\d+%?\s*/, "").trim();
         map.set(g.effectId, { id: g.effectId, label });

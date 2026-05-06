@@ -95,3 +95,81 @@ export function armorAllowedForClass(armorType: string | null, className: string
   if (!allowed) return true;
   return allowed.includes(armorType.toUpperCase());
 }
+
+/**
+ * Which primary "Acuity" stat each class actually uses.
+ * Used to render the correct label ("Intelligence", "Piety", "Empathy", "Charisma")
+ * on the Acuity row in the character summary.
+ */
+export const CLASS_ACUITY: Record<string, "INTELLIGENCE" | "PIETY" | "EMPATHY" | "CHARISMA"> = {
+  // Albion casters / hybrids
+  Wizard: "INTELLIGENCE", Sorcerer: "INTELLIGENCE", Theurgist: "INTELLIGENCE",
+  Cabalist: "INTELLIGENCE", Necromancer: "INTELLIGENCE", Occultist: "INTELLIGENCE",
+  Cleric: "PIETY", Friar: "PIETY", Paladin: "PIETY", Heretic: "PIETY", Reaver: "PIETY",
+  Minstrel: "CHARISMA",
+  // Hibernia
+  Eldritch: "INTELLIGENCE", Enchanter: "INTELLIGENCE", Mentalist: "INTELLIGENCE",
+  Animist: "INTELLIGENCE", Bainshee: "INTELLIGENCE", Valewalker: "INTELLIGENCE",
+  Druid: "EMPATHY", Warden: "EMPATHY",
+  Bard: "CHARISMA",
+  // Midgard
+  Runemaster: "PIETY", Spiritmaster: "PIETY", Bonedancer: "PIETY", Warlock: "PIETY",
+  Healer: "PIETY", Shaman: "PIETY",
+  Skald: "CHARISMA",
+  Thane: "PIETY", Valkyrie: "PIETY",
+};
+
+/**
+ * Skill IDs (matches SKILLS in spellcraft.ts) that each class can actually use.
+ * Anything not listed gets hidden from the spellcraft Skills picker for that class.
+ */
+export const CLASS_SKILLS: Record<string, string[]> = {
+  // Albion
+  Armsman: ["TWO_HANDED", "CRUSH", "SLASH", "THRUST", "POLEARM", "PARRY", "SHIELD"],
+  Paladin: ["CRUSH", "SLASH", "THRUST", "PARRY", "SHIELD", "SMITE"],
+  Mercenary: ["CRUSH", "SLASH", "THRUST", "DUAL_WIELD", "PARRY"],
+  Reaver: ["CRUSH", "SLASH", "THRUST", "FLEXIBLE", "SHIELD", "SOULRENDING"],
+  Cleric: ["CRUSH", "SHIELD", "REJUVENATION", "ENHANCEMENT", "SMITE"],
+  Friar: ["STAFF", "PARRY", "REJUVENATION", "ENHANCEMENT"],
+  Heretic: ["CRUSH", "SHIELD", "REJUVENATION", "ENHANCEMENT"],
+  Minstrel: ["SLASH", "THRUST", "STEALTH", "PARRY", "SHIELD"],
+  Scout: ["SLASH", "THRUST", "STEALTH", "SHIELD", "PARRY"],
+  Infiltrator: ["SLASH", "THRUST", "STEALTH", "ENVENOM", "CRITICAL_STRIKE", "DUAL_WIELD"],
+  Wizard: ["COLD_MAGIC", "EARTH_MAGIC", "FIRE_MAGIC"],
+  Sorcerer: ["BODY_MAGIC", "MIND_MAGIC", "MATTER_MAGIC"],
+  Theurgist: ["EARTH_MAGIC", "COLD_MAGIC", "WIND_MAGIC"],
+  Cabalist: ["BODY_MAGIC", "MATTER_MAGIC", "SPIRIT_MAGIC"],
+  Necromancer: ["PAINWORKING", "DEATH_SERVANT", "DEATH_SIGHT"],
+  Occultist: ["PAINWORKING", "DEATH_SIGHT", "SOULRENDING"],
+  // Hibernia
+  Hero: ["BLADES", "BLUNT", "PIERCING", "LARGE_WEAPONRY", "PARRY", "SHIELD"],
+  Champion: ["BLADES", "BLUNT", "PIERCING", "LARGE_WEAPONRY", "PARRY", "SHIELD", "VALOR"],
+  Warden: ["BLADES", "BLUNT", "PIERCING", "PARRY", "SHIELD", "REGROWTH", "NURTURE"],
+  Druid: ["BLUNT", "REGROWTH", "NURTURE", "MENDING"],
+  Bard: ["BLADES", "BLUNT", "MUSIC", "REGROWTH", "NURTURE"],
+  Blademaster: ["BLADES", "BLUNT", "PIERCING", "CELTIC_DUAL", "PARRY"],
+  Ranger: ["BLADES", "PIERCING", "CELTIC_DUAL", "STEALTH_HIB", "RECURVE_BOW"],
+  Valewalker: ["SCYTHE", "PARRY"],
+  Vampiir: ["PIERCING"],
+  Nightshade: ["BLADES", "PIERCING", "CELTIC_DUAL", "STEALTH_HIB", "ENVENOM"],
+  Animist: ["MANA", "ARBOREAL_PATH", "CREEPING_PATH", "VERDANT_PATH"],
+  Bainshee: ["MENTALISM", "MUSIC"],
+  Eldritch: ["LIGHT", "VOID", "MANA"],
+  Enchanter: ["LIGHT", "MANA", "ENCHANTMENTS"],
+  Mentalist: ["LIGHT", "MENTALISM", "MANA"],
+  // Midgard
+  Warrior: ["AXE", "HAMMER", "SWORD", "PARRY_MID", "SHIELD"],
+  Thane: ["AXE", "HAMMER", "SWORD", "PARRY_MID", "SHIELD", "STORMCALLING"],
+  Skald: ["AXE", "HAMMER", "SWORD", "BATTLESONGS", "PARRY_MID", "SHIELD"],
+  Valkyrie: ["SWORD", "SPEAR", "PARRY_MID", "SHIELD", "MENDING"],
+  Berserker: ["AXE", "HAMMER", "SWORD", "LEFT_AXE", "PARRY_MID"],
+  Savage: ["AXE", "HAMMER", "SWORD", "HAND2HAND", "PARRY_MID"],
+  Hunter: ["SWORD", "SPEAR", "COMPOSITE_BOW", "STEALTH_MID", "PARRY_MID"],
+  Healer: ["MENDING", "AUGMENTATION", "PACIFICATION"],
+  Shaman: ["MENDING", "AUGMENTATION", "DARKNESS"],
+  Shadowblade: ["AXE", "SWORD", "LEFT_AXE", "STEALTH_MID", "ENVENOM", "CRITICAL_STRIKE"],
+  Bonedancer: ["DARKNESS", "SUPPRESSION", "BONE_ARMY"],
+  Runemaster: ["DARKNESS", "SUPPRESSION", "RUNECARVING"],
+  Spiritmaster: ["DARKNESS", "SUPPRESSION"],
+  Warlock: ["HEXING", "CURSING"],
+};
