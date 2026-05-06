@@ -78,7 +78,7 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
       list.sort((a, b) => (b.bonus_level ?? 0) - (a.bonus_level ?? 0));
     }
     return list.slice(0, 300);
-  }, [items, search, className, statFilters]);
+  }, [items, search, className, statFilters, slotDef]);
 
   function toggleStat(id: string) {
     setStatFilters((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
