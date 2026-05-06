@@ -114,9 +114,24 @@ export const CAPS: Record<string, CapDef> = {
 
   // Bonuses (capped %)
   CASTING_SPEED_BONUS: bonusPct("Casting Speed", "CASTING_SPEED_BONUS", 10),
-  SPELL_DAMAGE_BONUS: bonusPct("Spell Damage", "SPELL_DAMAGE_BONUS", 10),
-  MELEE_SPEED_BONUS: bonusPct("Melee Speed", "MELEE_SPEED_BONUS", 10),
-  MELEE_DAMAGE_BONUS: bonusPct("Melee Damage", "MELEE_DAMAGE_BONUS", 10),
+  // Spell Damage and "Magic Damage" (TOA) are the same bonus in DAoC.
+  SPELL_DAMAGE_BONUS: {
+    label: "Spell / Magic Damage",
+    effectIds: ["SPELL_DAMAGE_BONUS", "MAGIC_DAMAGE", "MAGIC_DAMAGE_BONUS"],
+    itemCap: 10, hardCap: 10, kind: "bonusPct", group: "bonus",
+  },
+  // Melee Speed includes Archery Speed (same swing-speed bonus).
+  MELEE_SPEED_BONUS: {
+    label: "Melee / Archery Speed",
+    effectIds: ["MELEE_SPEED_BONUS", "ARCHERY_SPEED", "ARCHERY_SPEED_BONUS"],
+    itemCap: 10, hardCap: 10, kind: "bonusPct", group: "bonus",
+  },
+  // Melee Damage includes Archery Damage.
+  MELEE_DAMAGE_BONUS: {
+    label: "Melee / Archery Damage",
+    effectIds: ["MELEE_DAMAGE_BONUS", "ARCHERY_DMG", "ARCHERY_DAMAGE"],
+    itemCap: 10, hardCap: 10, kind: "bonusPct", group: "bonus",
+  },
   STYLE_DAMAGE_BONUS: bonusPct("Style Damage", "STYLE_DAMAGE_BONUS", 10),
   RESIST_PIERCE: bonusPct("Resist Pierce", "RESIST_PIERCE", 10),
   SPELL_RANGE_BONUS: bonusPct("Spell Range", "SPELL_RANGE_BONUS", 10),
