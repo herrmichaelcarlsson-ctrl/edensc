@@ -58,7 +58,9 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
     const q = search.trim().toLowerCase();
     const list = items
       .filter((i) => itemAllowedForClass(i.class_restriction, className))
-      .filter((i) => armorAllowedForClass(i.armor_type, className))
+      .filter((i) => slotDef?.group === "armor"
+        ? armorAllowedForClass(i.armor_type, className)
+        : true)
       .filter((i) => !q || i.name.toLowerCase().includes(q))
       .filter((i) => {
         if (statFilters.length === 0) return true;
