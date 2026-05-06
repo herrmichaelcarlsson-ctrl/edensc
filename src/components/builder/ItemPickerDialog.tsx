@@ -58,7 +58,9 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
     const q = search.trim().toLowerCase();
     const list = items
       .filter((i) => itemAllowedForClass(i.class_restriction, className))
-      .filter((i) => armorAllowedForClass(i.armor_type, className))
+      .filter((i) => slotDef?.group === "armor"
+        ? armorAllowedForClass(i.armor_type, className)
+        : true)
       .filter((i) => !q || i.name.toLowerCase().includes(q))
       .filter((i) => {
         if (statFilters.length === 0) return true;
@@ -76,7 +78,7 @@ export function ItemPickerDialog({ open, onClose, slot, realm, className, onPick
       list.sort((a, b) => (b.bonus_level ?? 0) - (a.bonus_level ?? 0));
     }
     return list.slice(0, 300);
-  }, [items, search, className, statFilters]);
+  }, [items, search, className, statFilters, slotDef]);
 
   function toggleStat(id: string) {
     setStatFilters((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
