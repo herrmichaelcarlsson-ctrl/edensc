@@ -10,6 +10,7 @@ export interface PersistedState {
   slots: TemplateSlots;
   templateName: string;
   spellcraft?: SpellcraftMap;
+  targets?: Partial<Record<string, number>>;
 }
 
 export function loadState(): PersistedState | null {
