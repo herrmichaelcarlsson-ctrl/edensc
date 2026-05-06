@@ -14,6 +14,8 @@ import { GearScorePanel } from "@/components/builder/GearScorePanel";
 import { ResistHolePanel } from "@/components/builder/ResistHolePanel";
 import { SlotActionDialog } from "@/components/builder/SlotActionDialog";
 import { CustomItemDialog } from "@/components/builder/CustomItemDialog";
+import { AutocraftDialog } from "@/components/builder/AutocraftDialog";
+import { autocraftTemplate, type CapTarget } from "@/lib/daoc/autocraft";
 import { SLOTS } from "@/lib/daoc/slots";
 import type { DBItem, Realm, SlotKey, TemplateSlots } from "@/lib/daoc/types";
 import { aggregate } from "@/lib/daoc/aggregate";
@@ -23,7 +25,7 @@ import { loadState, saveState } from "@/lib/daoc/storage";
 import { findRace } from "@/lib/daoc/races";
 import { exportTemplateText } from "@/lib/daoc/export";
 import { importZenkcraftText } from "@/lib/daoc/import";
-import { ArrowLeft, FileText, Save, Trash2, Download, Upload, Globe2, GitCompare, Search } from "lucide-react";
+import { ArrowLeft, FileText, Save, Trash2, Download, Upload, Globe2, GitCompare, Search, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import type { ItemEffect } from "@/lib/daoc/types";
@@ -51,6 +53,8 @@ function BuilderPage() {
   const [customItemSlot, setCustomItemSlot] = useState<SlotKey | null>(null);
   const [spellcraft, setSpellcraft] = useState<SpellcraftMap>({});
   const [itemsCache, setItemsCache] = useState<Record<string, DBItem>>({});
+  const [targets, setTargets] = useState<CapTarget>({});
+  const [autocraftOpen, setAutocraftOpen] = useState(false);
 
   // Initial load from localStorage
   useEffect(() => {
@@ -65,6 +69,7 @@ function BuilderPage() {
     setSlots(s.slots ?? {});
     setTemplateName(s.templateName ?? "Untitled Template");
     setSpellcraft(s.spellcraft ?? {});
+    setTargets(s.targets ?? {});
   }, [navigate]);
 
   // Resolve item ids in slots → fetch any missing
@@ -90,8 +95,8 @@ function BuilderPage() {
   // Persist
   useEffect(() => {
     if (!realm) return;
-    saveState({ realm, className, race, slots, templateName, spellcraft });
-  }, [realm, className, race, slots, templateName, spellcraft]);
+    saveState({ realm, className, race, slots, templateName, spellcraft, targets });
+  }, [realm, className, race, slots, templateName, spellcraft, targets]);
 
   const itemsBySlot = useMemo(() => {
     const map: Partial<Record<SlotKey, DBItem | undefined>> = {};
@@ -211,6 +216,17 @@ function BuilderPage() {
     setSlots({});
     setSpellcraft({});
     toast.success("Template cleared");
+  }
+
+  function runAutocraft() {
+    if (Object.keys(targets).length === 0) {
+      toast.error("Set at least one target cap first");
+      return;
+    }
+    const next = autocraftTemplate(itemsBySlot, spellcraft, targets);
+    setSpellcraft(next);
+    setAutocraftOpen(false);
+    toast.success("Autocrafted — gems placed in every craftable slot");
   }
 
   async function saveToCloud() {
