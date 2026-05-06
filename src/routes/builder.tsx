@@ -359,6 +359,9 @@ function BuilderPage() {
           <Link to="/compare" className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground px-2 py-1.5">
             <GitCompare className="h-4 w-4 mr-1.5" /> Compare
           </Link>
+          <Button size="sm" variant="ghost" onClick={() => setAutocraftOpen(true)}>
+            <Wand2 className="h-4 w-4 mr-1.5" /> Autocraft
+          </Button>
           <label className="inline-flex items-center text-sm cursor-pointer text-muted-foreground hover:text-foreground px-2 py-1.5 rounded">
             <Upload className="h-4 w-4 mr-1.5" /> Import
             <input type="file" accept="application/json,text/plain,.json,.txt" onChange={importJson} className="hidden" />
@@ -507,6 +510,15 @@ function BuilderPage() {
           if (!spellcraftSlot) return;
           setSpellcraft((sc) => ({ ...sc, [spellcraftSlot]: gs }));
         }}
+      />
+
+      <AutocraftDialog
+        open={autocraftOpen}
+        onClose={() => setAutocraftOpen(false)}
+        targets={targets}
+        onChange={setTargets}
+        onRun={runAutocraft}
+        className={className}
       />
     </div>
   );
