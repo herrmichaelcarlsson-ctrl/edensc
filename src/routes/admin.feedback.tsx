@@ -1,11 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  verifyAdminPassword,
-  updateFeatureRequestStatus,
-  deleteFeatureRequest,
-} from "@/server/feature-requests";
+import { createServerFn } from "@tanstack/start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +19,32 @@ import type { FeatureRequest } from "@/components/feature-requests/FeatureReques
 
 const ADMIN_KEY = "daoc-template-builder:admin-pw:v1";
 
+/* =========================
+   SERVER FUNCTIONS
+========================= */
+
+const verifyAdminPassword = createServerFn()
+  .handler(async ({ data }: { data: { password: string } }) => {
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+    return { ok: data.password === ADMIN_PASSWORD };
+  });
+
+const updateFeatureRequestStatus = createServerFn()
+  .handler(async ({ data }: any) => {
+    // TODO: koppla DB update här
+    return { ok: true };
+  });
+
+const deleteFeatureRequest = createServerFn()
+  .handler(async ({ data }: any) => {
+    // TODO: koppla DB delete här
+    return { ok: true };
+  });
+
+/* =========================
+   ROUTE
+========================= */
+
 export const Route = createFileRoute("/admin/feedback")({
   head: () => ({
     meta: [{ title: "Admin — Önskemål" }],
@@ -38,20 +60,24 @@ function AdminFeedbackPage() {
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  // Try saved password
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? localStorage.getItem(ADMIN_KEY) : null;
+    const saved =
+      typeof window !== "undefined"
+        ? localStorage.getItem(ADMIN_KEY)
+        : null;
+
     if (saved) {
       setPassword(saved);
       void tryLogin(saved, true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function tryLogin(pw: string, silent = false) {
     setChecking(true);
+
     try {
       const res = await verifyAdminPassword({ data: { password: pw } });
+
       if (res.ok) {
         setAuthed(true);
         localStorage.setItem(ADMIN_KEY, pw);
@@ -61,51 +87,75 @@ function AdminFeedbackPage() {
         localStorage.removeItem(ADMIN_KEY);
         setAuthed(false);
       }
-    } catch (e) {
+    } catch {
       if (!silent) toast.error("Inloggning misslyckades");
     }
+
     setChecking(false);
   }
 
   async function refresh() {
     setLoading(true);
-    const client = supabase.from("feature_requests" as never) as unknown as {
-      select: (q: string) => Promise<{ data: FeatureRequest[] | null; error: { message: string } | null }>;
-    };
-    const { data, error } = await client.select("*");
+
+    const { data, error } = await supabase
+      .from("feature_requests")
+      .select("*");
+
     if (error) toast.error(error.message);
-    setItems(
-      (data ?? []).sort((a, b) => {
-        const order = { open: 0, planned: 1, done: 2, rejected: 3 } as const;
-        if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
-        return b.vote_count - a.vote_count;
-      }),
-    );
+
+    const sorted = (data ?? []).sort((a, b) => {
+      const order = { open: 0, planned: 1, done: 2, rejected: 3 } as const;
+
+      if (order[a.status] !== order[b.status]) {
+        return order[a.status] - order[b.status];
+      }
+
+      return b.vote_count - a.vote_count;
+    });
+
+    setItems(sorted);
     setLoading(false);
   }
 
-  async function changeStatus(id: string, status: FeatureRequest["status"]) {
+  async function changeStatus(
+    id: string,
+    status: FeatureRequest["status"],
+  ) {
     setBusyId(id);
+
     try {
-      await updateFeatureRequestStatus({ data: { password, id, status } });
-      setItems((arr) => arr.map((it) => (it.id === id ? { ...it, status } : it)));
+      await updateFeatureRequestStatus({
+        data: { password, id, status },
+      });
+
+      setItems((arr) =>
+        arr.map((it) => (it.id === id ? { ...it, status } : it)),
+      );
+
       toast.success("Status uppdaterad");
-    } catch (e) {
+    } catch {
       toast.error("Kunde inte uppdatera");
     }
+
     setBusyId(null);
   }
 
   async function remove(id: string) {
     if (!confirm("Ta bort önskemålet?")) return;
+
     setBusyId(id);
+
     try {
-      await deleteFeatureRequest({ data: { password, id } });
+      await deleteFeatureRequest({
+        data: { password, id },
+      });
+
       setItems((arr) => arr.filter((it) => it.id !== id));
       toast.success("Borttaget");
-    } catch (e) {
+    } catch {
       toast.error("Kunde inte ta bort");
     }
+
     setBusyId(null);
   }
 
@@ -118,16 +168,20 @@ function AdminFeedbackPage() {
   return (
     <div className="min-h-screen">
       <Toaster richColors position="bottom-right" />
+
       <header className="border-b border-border bg-background/85 backdrop-blur">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Link to="/" className="text-muted-foreground hover:text-primary">
             <ArrowLeft className="h-4 w-4" />
           </Link>
+
           <h1 className="font-display text-xl flex items-center gap-2">
             <Lock className="h-4 w-4" />
             Admin — Önskemål
           </h1>
+
           <div className="flex-1" />
+
           {authed && (
             <Button size="sm" variant="ghost" onClick={logout}>
               Logga ut
@@ -146,23 +200,34 @@ function AdminFeedbackPage() {
             className="max-w-sm space-y-3 rounded-lg border border-border bg-card/60 p-4"
           >
             <label className="text-sm">Adminlösenord</label>
+
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoFocus
             />
-            <Button type="submit" disabled={checking || !password} className="w-full">
-              {checking && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+
+            <Button
+              type="submit"
+              disabled={checking || !password}
+              className="w-full"
+            >
+              {checking && (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              )}
               Logga in
             </Button>
           </form>
         ) : loading ? (
           <div className="flex items-center justify-center py-12 text-muted-foreground">
-            <Loader2 className="h-5 w-5 animate-spin mr-2" /> Laddar…
+            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            Laddar…
           </div>
         ) : items.length === 0 ? (
-          <div className="text-muted-foreground text-sm">Inga önskemål ännu.</div>
+          <div className="text-muted-foreground text-sm">
+            Inga önskemål ännu.
+          </div>
         ) : (
           <ul className="space-y-2">
             {items.map((req) => (
@@ -173,21 +238,25 @@ function AdminFeedbackPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-medium">{req.title}</span>
+
                     <Badge variant="outline" className="text-[10px]">
                       {req.vote_count} röster
                     </Badge>
+
                     {req.author_name && (
                       <span className="text-[10px] text-muted-foreground">
                         av {req.author_name}
                       </span>
                     )}
                   </div>
+
                   {req.description && (
                     <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap">
                       {req.description}
                     </p>
                   )}
                 </div>
+
                 <div className="flex items-center gap-2 shrink-0">
                   <Select
                     value={req.status}
@@ -199,6 +268,7 @@ function AdminFeedbackPage() {
                     <SelectTrigger className="h-8 text-xs w-[130px]">
                       <SelectValue />
                     </SelectTrigger>
+
                     <SelectContent>
                       <SelectItem value="open">Open</SelectItem>
                       <SelectItem value="planned">Planerad</SelectItem>
@@ -206,6 +276,7 @@ function AdminFeedbackPage() {
                       <SelectItem value="rejected">Avvisad</SelectItem>
                     </SelectContent>
                   </Select>
+
                   <Button
                     size="sm"
                     variant="ghost"
